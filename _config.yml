@@ -1,8 +1,0 @@
-theme: null
-plugins: []
-include:
-  - .nojekyll
-
-# GitHub Pages settings
-future: true
-permalink: pretty
