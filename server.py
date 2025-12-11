@@ -16,7 +16,7 @@ import signal
 import sys
 import threading
 from pathlib import Path
-from urllib.parse import urlparse, unquote
+from urllib.parse import urlparse, unquote, parse_qs
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 
@@ -67,26 +67,60 @@ class ThreadSafeLogger:
         self.logger.addHandler(console_handler)
         
         self._lock = threading.Lock()
+        
+        # Lưu trữ logs (tối đa 500 dòng)
+        self.log_buffer = []
+        self.max_logs = 500
+        
+        # Thêm thông báo khởi tạo vào buffer với format đầy đủ
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        thread_name = threading.current_thread().name
+        init_msg = f'{timestamp} - [{thread_name}] - INFO - Logger initialized'
+        self.log_buffer.append(init_msg)
+    
+    def _add_to_buffer(self, msg):
+        """Thêm log vào buffer (gọi từ trong lock)"""
+        self.log_buffer.append(msg)
+        # Giữ tối đa max_logs dòng
+        if len(self.log_buffer) > self.max_logs:
+            self.log_buffer.pop(0)
     
     def info(self, msg):
         """Log info"""
         with self._lock:
             self.logger.info(msg)
+            # Tạo log entry với format đầy đủ tương tự terminal
+            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            thread_name = threading.current_thread().name
+            log_entry = f'{timestamp} - [{thread_name}] - INFO - {msg}'
+            self._add_to_buffer(log_entry)
     
     def error(self, msg):
         """Log error"""
         with self._lock:
             self.logger.error(msg)
+            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            thread_name = threading.current_thread().name
+            log_entry = f'{timestamp} - [{thread_name}] - ERROR - {msg}'
+            self._add_to_buffer(log_entry)
     
     def warning(self, msg):
         """Log warning"""
         with self._lock:
             self.logger.warning(msg)
+            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            thread_name = threading.current_thread().name
+            log_entry = f'{timestamp} - [{thread_name}] - WARNING - {msg}'
+            self._add_to_buffer(log_entry)
     
     def debug(self, msg):
         """Log debug"""
         with self._lock:
             self.logger.debug(msg)
+            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            thread_name = threading.current_thread().name
+            log_entry = f'{timestamp} - [{thread_name}] - DEBUG - {msg}'
+            self._add_to_buffer(log_entry)
 
 
 # ============================================================================
@@ -168,6 +202,10 @@ class HTTPServer:
         
         # Socket server
         self.server_socket = None
+        
+        # Lưu trữ kết quả test
+        self.test_results = []
+        self._results_lock = threading.Lock()
         
         # Đăng ký signal handlers
         signal.signal(signal.SIGINT, self._signal_handler)
@@ -304,7 +342,7 @@ class HTTPServer:
                 self.logger.info(f'{client_ip}:{client_port} - {method} {path} {http_version}')
                 
                 # Kiểm tra method
-                if method not in ['GET', 'HEAD']:
+                if method not in ['GET', 'HEAD', 'POST']:
                     self._send_response(
                         client_socket,
                         405,
@@ -316,6 +354,11 @@ class HTTPServer:
                 # Parse URL
                 parsed_url = urlparse(path)
                 file_path = unquote(parsed_url.path)
+                
+                # Xử lý API requests
+                if file_path.startswith('/api/'):
+                    self._handle_api(client_socket, method, file_path, request_data, client_ip, client_port)
+                    return
                 
                 # Ngăn chặn path traversal attack
                 if not self._is_safe_path(file_path):
@@ -384,6 +427,96 @@ class HTTPServer:
                 client_socket.close()
             except:
                 pass
+    
+    def _handle_api(self, client_socket, method, path, request_data, client_ip, client_port):
+        """
+        Xử lý API requests
+        
+        Args:
+            client_socket: Socket của client
+            method (str): HTTP method
+            path (str): Đường dẫn API
+            request_data (bytes): Dữ liệu request
+            client_ip (str): IP client
+            client_port (int): Port client
+        """
+        try:
+            if path == '/api/test-results' and method == 'POST':
+                # Parse request body
+                try:
+                    request_str = request_data.decode('utf-8', errors='ignore')
+                    # Tách header và body
+                    header_end = request_str.find('\r\n\r\n')
+                    if header_end != -1:
+                        body_str = request_str[header_end + 4:]
+                        # Parse JSON từ body
+                        test_data = json.loads(body_str)
+                        
+                        # Lưu kết quả test
+                        with self._results_lock:
+                            self.test_results = test_data
+                        
+                        self.logger.info(f'{client_ip}:{client_port} - POST /api/test-results - Lưu {len(test_data.get("results", []))} kết quả test')
+                        
+                        # Trả về response JSON
+                        response_body = json.dumps({
+                            'success': True,
+                            'message': 'Đã lưu kết quả test',
+                            'count': len(test_data.get('results', []))
+                        })
+                        
+                        response_header = (
+                            'HTTP/1.1 200 OK\r\n'
+                            'Content-Type: application/json; charset=utf-8\r\n'
+                            f'Content-Length: {len(response_body.encode("utf-8"))}\r\n'
+                            'Connection: close\r\n\r\n'
+                        )
+                        
+                        client_socket.sendall(response_header.encode('utf-8'))
+                        client_socket.sendall(response_body.encode('utf-8'))
+                except json.JSONDecodeError:
+                    self._send_response(client_socket, 400, 'Bad Request', 'Invalid JSON')
+            
+            elif path == '/api/test-results' and method == 'GET':
+                # Trả về kết quả test hiện tại
+                with self._results_lock:
+                    response_body = json.dumps(self.test_results)
+                
+                response_header = (
+                    'HTTP/1.1 200 OK\r\n'
+                    'Content-Type: application/json; charset=utf-8\r\n'
+                    f'Content-Length: {len(response_body.encode("utf-8"))}\r\n'
+                    'Connection: close\r\n\r\n'
+                )
+                
+                client_socket.sendall(response_header.encode('utf-8'))
+                client_socket.sendall(response_body.encode('utf-8'))
+            
+            elif path == '/api/logs' and method == 'GET':
+                # Trả về server logs
+                with self.logger._lock:
+                    logs = list(self.logger.log_buffer)
+                
+                response_body = json.dumps({
+                    'timestamp': datetime.now().isoformat(),
+                    'logs': logs
+                })
+                
+                response_header = (
+                    'HTTP/1.1 200 OK\r\n'
+                    'Content-Type: application/json; charset=utf-8\r\n'
+                    f'Content-Length: {len(response_body.encode("utf-8"))}\r\n'
+                    'Connection: close\r\n\r\n'
+                )
+                
+                client_socket.sendall(response_header.encode('utf-8'))
+                client_socket.sendall(response_body.encode('utf-8'))
+            else:
+                self._send_response(client_socket, 404, 'Not Found', 'API endpoint không tồn tại\n')
+        
+        except Exception as e:
+            self.logger.error(f'{client_ip}:{client_port} - Lỗi xử lý API: {e}')
+            self._send_response(client_socket, 500, 'Internal Server Error', 'Lỗi server nội bộ\n')
     
     def _is_safe_path(self, file_path):
         """

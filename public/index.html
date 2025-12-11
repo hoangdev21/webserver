@@ -121,6 +121,108 @@
                 <h2>Tìm Hiểu Thêm</h2>
                 <p>Muốn hiểu rõ hơn về cách hoạt động? Hãy xem trang <a href="/about.html">Giới Thiệu</a></p>
             </section>
+
+            <section class="server-logs">
+                <h2>📋 Live Server Logs</h2>
+                <div class="logs-container">
+                    <div id="logs-placeholder" class="placeholder">
+                        <p>Đang chờ dữ liệu từ server...</p>
+                    </div>
+                    <div id="logs-content" style="display: none;">
+                        <div class="logs-controls">
+                            <button id="logs-refresh-btn" class="btn-refresh">🔄 Làm Mới</button>
+                            <button id="logs-clear-btn" class="btn-clear">🗑️ Xóa</button>
+                            <label class="auto-refresh-label">
+                                <input type="checkbox" id="auto-refresh-toggle" checked>
+                                Auto-refresh (1s)
+                            </label>
+                        </div>
+                        <div class="logs-terminal">
+                            <div id="logs-terminal-content" class="terminal-content"></div>
+                        </div>
+                        <div class="logs-footer">
+                            <span id="logs-count">-</span> dòng | <span id="logs-time">-</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="test-results">
+                <h2>📊 Kết Quả Test Từ Client</h2>
+                <div class="test-results-container">
+                    <div id="results-placeholder" class="placeholder">
+                        <p>Chưa có kết quả test. Vui lòng chạy client test để xem kết quả.</p>
+                    </div>
+                    <div id="results-content" style="display: none;">
+                        <div class="results-summary">
+                            <h3>Tổng Quan</h3>
+                            <div class="summary-grid">
+                                <div class="summary-item">
+                                    <span class="label">Tổng Requests:</span>
+                                    <span class="value" id="total-requests">-</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span class="label">Thành Công:</span>
+                                    <span class="value success" id="success-count">-</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span class="label">Thất Bại:</span>
+                                    <span class="value error" id="failed-count">-</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span class="label">Tỷ Lệ Thành Công:</span>
+                                    <span class="value" id="success-rate">-</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="results-table">
+                            <h3>Chi Tiết Từng Request</h3>
+                            <table class="details-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Path</th>
+                                        <th>Method</th>
+                                        <th>Status</th>
+                                        <th>Time (ms)</th>
+                                        <th>Size (bytes)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="results-tbody">
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="results-stats">
+                            <h3>Thống Kê Thời Gian Response</h3>
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <span class="label">Min:</span>
+                                    <span class="value" id="time-min">-</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="label">Max:</span>
+                                    <span class="value" id="time-max">-</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="label">Avg:</span>
+                                    <span class="value" id="time-avg">-</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="label">Median:</span>
+                                    <span class="value" id="time-median">-</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="results-footer">
+                            <p><small id="results-timestamp">Cập nhật lần cuối: -</small></p>
+                            <button id="refresh-btn" class="btn-refresh">🔄 Làm Mới</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
     </main>
 
@@ -129,5 +231,259 @@
             <p>&copy; 2025 Web Server Project. Made with ❤️ in Python</p>
         </div>
     </footer>
+
+    <script>
+        // Variables for auto-refresh
+        let autoRefreshLogsInterval = null;
+        let autoRefreshTestInterval = null;
+
+        // ===== SERVER LOGS FUNCTIONALITY =====
+        async function loadServerLogs() {
+            try {
+                const response = await fetch('/api/logs');
+                console.log('Fetch response status:', response.status);
+                
+                if (!response.ok) {
+                    console.error('API returned status:', response.status);
+                    showLogsPlaceholder();
+                    return;
+                }
+                
+                const text = await response.text();
+                console.log('Raw response length:', text.length);
+                
+                if (!text) {
+                    console.log('Empty response');
+                    showLogsPlaceholder();
+                    return;
+                }
+                
+                const data = JSON.parse(text);
+                console.log('Parsed data:', data);
+                
+                if (data && data.logs && data.logs.length > 0) {
+                    displayServerLogs(data);
+                } else {
+                    console.log('No logs in data');
+                    showLogsPlaceholder();
+                }
+            } catch (error) {
+                console.error('Error loading server logs:', error);
+                showLogsPlaceholder();
+            }
+        }
+        
+        function showLogsPlaceholder() {
+            document.getElementById('logs-placeholder').style.display = 'block';
+            document.getElementById('logs-content').style.display = 'none';
+            // Cập nhật text placeholder
+            const placeholder = document.getElementById('logs-placeholder');
+            if (placeholder) {
+                placeholder.innerHTML = '<p>Chưa có dữ liệu logs. Trang sẽ hiển thị server logs khi client gửi requests.</p>';
+            }
+        }
+        
+        function displayServerLogs(data) {
+            const logs = data.logs;
+            const timestamp = data.timestamp;
+            
+            // Ẩn placeholder, hiển thị content
+            document.getElementById('logs-placeholder').style.display = 'none';
+            document.getElementById('logs-content').style.display = 'block';
+            
+            // Populate logs terminal
+            const logsContent = document.getElementById('logs-terminal-content');
+            
+            logsContent.innerHTML = '';
+            
+            logs.forEach((log, index) => {
+                const logLine = document.createElement('div');
+                logLine.className = 'log-line';
+                
+                // Phân loại log theo level từ format: YYYY-MM-DD HH:MM:SS - [ThreadName] - LEVEL - message
+                if (log.includes('- ERROR -')) {
+                    logLine.classList.add('log-error');
+                } else if (log.includes('- WARNING -')) {
+                    logLine.classList.add('log-warning');
+                } else if (log.includes('- INFO -')) {
+                    logLine.classList.add('log-info');
+                } else if (log.includes('- DEBUG -')) {
+                    logLine.classList.add('log-debug');
+                }
+                
+                logLine.textContent = log;
+                logsContent.appendChild(logLine);
+            });
+            
+            // Scroll xuống dưới cùng - đảm bảo thực hiện ngay lập tức
+            const scrollContainer = logsContent.parentElement;
+            if (scrollContainer) {
+                scrollContainer.scrollTop = scrollContainer.scrollHeight;
+            }
+            logsContent.scrollTop = logsContent.scrollHeight;
+            
+            // Cập nhật thống kê
+            document.getElementById('logs-count').textContent = logs.length;
+            const date = new Date(timestamp);
+            const formattedTime = date.toLocaleString('vi-VN');
+            document.getElementById('logs-time').textContent = formattedTime;
+        }
+        
+        // ===== TEST RESULTS FUNCTIONALITY =====
+        async function loadTestResults() {
+            try {
+                const response = await fetch('/api/test-results');
+                const data = await response.json();
+                
+                if (data && data.results && data.results.length > 0) {
+                    displayResults(data);
+                } else {
+                    showPlaceholder();
+                }
+            } catch (error) {
+                console.error('Error loading test results:', error);
+                showPlaceholder();
+            }
+        }
+        
+        
+        function showPlaceholder() {
+            document.getElementById('results-placeholder').style.display = 'block';
+            document.getElementById('results-content').style.display = 'none';
+        }
+        
+        function displayResults(data) {
+            const results = data.results;
+            const timestamp = data.timestamp;
+            
+            // Ẩn placeholder, hiển thị content
+            document.getElementById('results-placeholder').style.display = 'none';
+            document.getElementById('results-content').style.display = 'block';
+            
+            // Tính toán thống kê
+            const successResults = results.filter(r => r.success);
+            const failedResults = results.filter(r => !r.success);
+            const successRate = ((successResults.length / results.length) * 100).toFixed(1);
+            
+            // Cập nhật summary
+            document.getElementById('total-requests').textContent = results.length;
+            document.getElementById('success-count').textContent = successResults.length;
+            document.getElementById('failed-count').textContent = failedResults.length;
+            document.getElementById('success-rate').textContent = successRate + '%';
+            
+            // Populate results table
+            const tbody = document.getElementById('results-tbody');
+            tbody.innerHTML = '';
+            
+            results.forEach(result => {
+                const row = document.createElement('tr');
+                const statusClass = result.success ? 'status-ok' : 'status-error';
+                const status = result.status_code ? `${result.status_code}` : 'ERROR';
+                
+                row.innerHTML = `
+                    <td>${result.request_id}</td>
+                    <td>${result.path}</td>
+                    <td>${result.method}</td>
+                    <td class="${statusClass}">${status}</td>
+                    <td>${result.response_time ? result.response_time.toFixed(2) : '-'}</td>
+                    <td>${result.content_length}</td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            // Tính toán thống kê thời gian
+            if (successResults.length > 0) {
+                const times = successResults.map(r => r.response_time).sort((a, b) => a - b);
+                const minTime = Math.min(...times);
+                const maxTime = Math.max(...times);
+                const avgTime = times.reduce((a, b) => a + b, 0) / times.length;
+                const medianTime = times[Math.floor(times.length / 2)];
+                
+                document.getElementById('time-min').textContent = minTime.toFixed(2) + ' ms';
+                document.getElementById('time-max').textContent = maxTime.toFixed(2) + ' ms';
+                document.getElementById('time-avg').textContent = avgTime.toFixed(2) + ' ms';
+                document.getElementById('time-median').textContent = medianTime.toFixed(2) + ' ms';
+            }
+            
+            // Cập nhật timestamp
+            const date = new Date(timestamp);
+            const formattedTime = date.toLocaleString('vi-VN');
+            document.getElementById('results-timestamp').textContent = `Cập nhật lần cuối: ${formattedTime}`;
+        }
+        
+        // ===== INITIALIZATION =====
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load logs khi trang load
+            loadServerLogs();
+            loadTestResults();
+            
+            // Logs refresh button
+            const logsRefreshBtn = document.getElementById('logs-refresh-btn');
+            if (logsRefreshBtn) {
+                logsRefreshBtn.addEventListener('click', function() {
+                    loadServerLogs();
+                    this.textContent = '⏳ Đang cập nhật...';
+                    setTimeout(() => {
+                        this.textContent = '🔄 Làm Mới';
+                    }, 500);
+                });
+            }
+            
+            // Logs clear button
+            const logsClearBtn = document.getElementById('logs-clear-btn');
+            if (logsClearBtn) {
+                logsClearBtn.addEventListener('click', function() {
+                    const logsContent = document.getElementById('logs-terminal-content');
+                    logsContent.innerHTML = '';
+                    document.getElementById('logs-count').textContent = '0';
+                });
+            }
+            
+            // Auto-refresh toggle for logs
+            const autoRefreshToggle = document.getElementById('auto-refresh-toggle');
+            if (autoRefreshToggle) {
+                autoRefreshToggle.addEventListener('change', function() {
+                    if (this.checked) {
+                        startAutoRefreshLogs();
+                    } else {
+                        stopAutoRefreshLogs();
+                    }
+                });
+                // Khởi động auto-refresh nếu checkbox checked
+                if (autoRefreshToggle.checked) {
+                    startAutoRefreshLogs();
+                }
+            }
+            
+            // Refresh button for test results
+            const refreshBtn = document.getElementById('refresh-btn');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', function() {
+                    loadTestResults();
+                    this.textContent = '⏳ Đang cập nhật...';
+                    setTimeout(() => {
+                        this.textContent = '🔄 Làm Mới';
+                    }, 1000);
+                });
+            }
+            
+            // Auto-refresh test results every 30 seconds
+            autoRefreshTestInterval = setInterval(loadTestResults, 30000);
+        });
+        
+        function startAutoRefreshLogs() {
+            if (autoRefreshLogsInterval) {
+                clearInterval(autoRefreshLogsInterval);
+            }
+            autoRefreshLogsInterval = setInterval(loadServerLogs, 1000); // 1 giây thay vì 5 giây
+        }
+        
+        function stopAutoRefreshLogs() {
+            if (autoRefreshLogsInterval) {
+                clearInterval(autoRefreshLogsInterval);
+                autoRefreshLogsInterval = null;
+            }
+        }
+    </script>
 </body>
 </html>

@@ -10,8 +10,10 @@ import socket
 import threading
 import time
 import statistics
+import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from urllib.parse import urljoin
+from datetime import datetime
 
 # ============================================================================
 # HTTP CLIENT
@@ -160,6 +162,9 @@ class HTTPClient:
         
         # Hiển thị kết quả
         self._print_results(total_time)
+        
+        # Gửi kết quả lên server
+        self._send_results_to_server()
     
     def _print_results(self, total_time):
         """
@@ -243,6 +248,58 @@ class HTTPClient:
             print()
         
         print('=' * 70)
+    
+    def _send_results_to_server(self):
+        """
+        Gửi kết quả test lên server qua API
+        """
+        try:
+            # Chuẩn bị dữ liệu
+            data = {
+                'timestamp': datetime.now().isoformat(),
+                'total_requests': len(self.results),
+                'results': self.results
+            }
+            
+            # Convert thành JSON
+            json_data = json.dumps(data)
+            json_bytes = json_data.encode('utf-8')
+            
+            # Tạo HTTP request
+            request = (
+                f'POST /api/test-results HTTP/1.1\r\n'
+                f'Host: {self.host}:{self.port}\r\n'
+                f'Content-Type: application/json\r\n'
+                f'Content-Length: {len(json_bytes)}\r\n'
+                f'Connection: close\r\n\r\n'
+            )
+            
+            # Gửi request
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(10)
+            sock.connect((self.host, self.port))
+            sock.sendall(request.encode('utf-8'))
+            sock.sendall(json_bytes)
+            
+            # Nhận response
+            response_data = b''
+            while True:
+                chunk = sock.recv(4096)
+                if not chunk:
+                    break
+                response_data += chunk
+            
+            sock.close()
+            
+            # Parse response
+            response_str = response_data.decode('utf-8', errors='ignore')
+            if '200 OK' in response_str:
+                print('✓ Đã gửi kết quả test lên server')
+            else:
+                print('✗ Lỗi gửi kết quả test lên server')
+        
+        except Exception as e:
+            print(f'✗ Lỗi kết nối API server: {e}')
 
 
 # ============================================================================
