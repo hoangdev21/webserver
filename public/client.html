@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Test - Giao Diện Kiểm Tra Web Server</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧪 Client Test - Kiểm Tra Server</h1>
+            <p>Giao Diện Web Để Test Web Server - Không Cần Chạy Terminal</p>
+        </header>
+
+        <div class="main-content">
+            <!-- Test Configuration Panel -->
+            <div class="card">
+                <h2>⚙️ Cấu Hình Kiểm Tra</h2>
+
+                <div class="info-box">
+                    <strong>Trạng Thái Server:</strong> <span class="status-indicator status-online"></span>
+                    <span id="server-status">Đang kiểm tra...</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Số Lượng Requests</label>
+                    <input type="number" id="num-requests" value="20" min="1" max="100">
+                </div>
+
+                <div class="form-group">
+                    <label>Số Threads Đồng Thời</label>
+                    <input type="number" id="concurrent-threads" value="5" min="1" max="20">
+                </div>
+
+                <div class="form-group">
+                    <label>Timeout (Giây)</label>
+                    <input type="number" id="timeout" value="10" min="1" max="60">
+                </div>
+
+                <div class="form-group">
+                    <label>Thêm Đường Dẫn Để Kiểm Tra</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="path-input" placeholder="vd: /index.html" style="flex: 1;">
+                        <button class="btn-add" onclick="addPath()">Thêm</button>
+                    </div>
+                </div>
+
+                <div class="path-list" id="path-list">
+                    <!-- Các đường dẫn sẽ được thêm ở đây -->
+                </div>
+
+                <div class="form-group">
+                    <label>Phương Thức HTTP</label>
+                    <select id="http-method">
+                        <option value="GET">GET</option>
+                        <option value="HEAD">HEAD</option>
+                    </select>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn-primary" id="start-test-btn" onclick="startTest()">
+                        ▶️ Bắt Đầu Kiểm Tra
+                    </button>
+                    <button class="btn-secondary" onclick="resetTest()">
+                        🔄 Đặt Lại
+                    </button>
+                </div>
+            </div>
+
+            <!-- Kết Quả Tóm Tắt -->
+            <div class="card">
+                <h2>📊 Kết Quả Kiểm Tra</h2>
+
+                <div id="results-summary" class="results-empty">
+                    Chạy kiểm tra để xem kết quả...
+                </div>
+
+                <div class="progress-container" id="progress-container" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill" style="width: 0%;">0%</div>
+                    </div>
+                    <div class="progress-text" id="progress-text">Đang chuẩn bị kiểm tra...</div>
+                </div>
+
+                <div class="stats-grid" id="stats-grid" style="display: none;">
+                    <div class="stat-box">
+                        <div class="stat-value" id="stat-success">0</div>
+                        <div class="stat-label">Thành Công</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="stat-failed">0</div>
+                        <div class="stat-label">Thất Bại</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="stat-avg-time">0ms</div>
+                        <div class="stat-label">Thời Gian TB</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="stat-throughput">0</div>
+                        <div class="stat-label">Req/Giây</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kết Quả Chi Tiết -->
+            <div class="results-panel">
+                <h2>📝 Kết Quả Chi Tiết</h2>
+
+                <div class="tab-buttons">
+                    <button class="tab-btn active" onclick="switchTab('raw')">Đầu Ra</button>
+                    <button class="tab-btn" onclick="switchTab('requests')">Requests</button>
+                    <button class="tab-btn" onclick="switchTab('analysis')">Phân Tích</button>
+                </div>
+
+                <div id="raw-tab" class="tab-content active">
+                    <div class="results-content" id="results-output">
+                        Chạy kiểm tra để xem kết quả chi tiết...
+                    </div>
+                </div>
+
+                <div id="requests-tab" class="tab-content">
+                    <div class="results-content" id="requests-output">
+                        Chạy kiểm tra để xem danh sách requests...
+                    </div>
+                </div>
+
+                <div id="analysis-tab" class="tab-content">
+                    <div class="results-content" id="analysis-output">
+                        Chạy kiểm tra để xem phân tích chi tiết...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2025 Client Test Web Server | Giao Diện Kiểm Tra Theo Thời Gian Thực</p>
+        </footer>
+    </div>
+
+    <script>
+        // Default paths
+        const defaultPaths = [
+            '/',
+            '/index.html',
+            '/about.html',
+            '/style.css',
+            '/404.html'
+        ];
+
+        let testResults = [];
+        let currentTest = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDefaultPaths();
+            checkServerStatus();
+            setInterval(checkServerStatus, 5000);
+        });
+
+        function loadDefaultPaths() {
+            const pathList = document.getElementById('path-list');
+            pathList.innerHTML = '';
+            defaultPaths.forEach((path, idx) => {
+                addPathUI(path, idx);
+            });
+        }
+
+        function addPathUI(path, id) {
+            const pathList = document.getElementById('path-list');
+            const pathItem = document.createElement('div');
+            pathItem.className = 'path-item';
+            pathItem.innerHTML = `
+                <span>${path}</span>
+                <span class="path-remove" onclick="removePath(this)">×</span>
+            `;
+            pathList.appendChild(pathItem);
+        }
+
+        function addPath() {
+            const input = document.getElementById('path-input');
+            const path = input.value.trim();
+            
+            if (!path) {
+                alert('Vui lòng nhập đường dẫn');
+                return;
+            }
+            
+            if (!path.startsWith('/')) {
+                alert('Đường dẫn phải bắt đầu bằng /');
+                return;
+            }
+            
+            addPathUI(path, Date.now());
+            input.value = '';
+        }
+
+        function removePath(element) {
+            element.closest('.path-item').remove();
+        }
+
+        function getPaths() {
+            const paths = [];
+            document.querySelectorAll('.path-item span:first-child').forEach(item => {
+                paths.push(item.textContent);
+            });
+            return paths;
+        }
+
+        function checkServerStatus() {
+            const statusEl = document.getElementById('server-status');
+            const statusIndicator = document.querySelector('.status-indicator');
+            
+            fetch('/', { method: 'HEAD' })
+                .then(res => {
+                    statusEl.textContent = 'Trực Tuyến';
+                    statusIndicator.className = 'status-indicator status-online';
+                })
+                .catch(err => {
+                    statusEl.textContent = 'Ngoại Tuyến';
+                    statusIndicator.className = 'status-indicator status-offline';
+                });
+        }
+
+        async function startTest() {
+            const numRequests = parseInt(document.getElementById('num-requests').value);
+            const method = document.getElementById('http-method').value;
+            const timeout = parseInt(document.getElementById('timeout').value);
+            const paths = getPaths();
+
+            if (paths.length === 0) {
+                alert('Vui lòng thêm ít nhất một đường dẫn');
+                return;
+            }
+
+            if (numRequests < 1) {
+                alert('Số requests phải >= 1');
+                return;
+            }
+
+            testResults = [];
+            const btn = document.getElementById('start-test-btn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Đang Kiểm Tra...';
+
+            const progressContainer = document.getElementById('progress-container');
+            progressContainer.style.display = 'block';
+
+            document.getElementById('results-output').innerHTML = '';
+            document.getElementById('requests-output').innerHTML = '';
+            document.getElementById('analysis-output').innerHTML = '';
+
+            const startTime = Date.now();
+            let completed = 0;
+
+            for (let i = 0; i < numRequests; i++) {
+                const path = paths[i % paths.length];
+                const reqStart = Date.now();
+
+                try {
+                    const response = await fetch(path, {
+                        method: method,
+                        signal: AbortSignal.timeout(timeout * 1000)
+                    });
+
+                    const reqTime = Date.now() - reqStart;
+
+                    testResults.push({
+                        id: i + 1,
+                        path: path,
+                        method: method,
+                        status: response.status,
+                        time: reqTime,
+                        success: response.ok,
+                        contentLength: response.headers.get('content-length') || 'không xác định'
+                    });
+
+                    appendToOutput(`✓ [${i + 1}/${numRequests}] ${method} ${path} - Trạng Thái: ${response.status} - Thời Gian: ${reqTime}ms\n`);
+
+                } catch (error) {
+                    const reqTime = Date.now() - reqStart;
+
+                    testResults.push({
+                        id: i + 1,
+                        path: path,
+                        method: method,
+                        status: 'LỖI',
+                        time: reqTime,
+                        success: false,
+                        error: error.message
+                    });
+
+                    appendToOutput(`✗ [${i + 1}/${numRequests}] ${method} ${path} - Lỗi: ${error.message}\n`);
+                }
+
+                completed++;
+                updateProgress(completed, numRequests);
+            }
+
+            const totalTime = Date.now() - startTime;
+            displayResults(totalTime);
+
+            btn.disabled = false;
+            btn.textContent = '▶️ Bắt Đầu Kiểm Tra';
+        }
+
+        function updateProgress(completed, total) {
+            const percent = Math.round((completed / total) * 100);
+            const progressFill = document.getElementById('progress-fill');
+            progressFill.style.width = percent + '%';
+            progressFill.textContent = percent + '%';
+            document.getElementById('progress-text').textContent = `Đã Hoàn Thành: ${completed}/${total} requests`;
+        }
+
+        function appendToOutput(text) {
+            const output = document.getElementById('results-output');
+            output.textContent += text;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function displayResults(totalTime) {
+            const successful = testResults.filter(r => r.success).length;
+            const failed = testResults.filter(r => !r.success).length;
+            const avgTime = testResults.reduce((sum, r) => sum + r.time, 0) / testResults.length;
+            const throughput = (testResults.length / (totalTime / 1000)).toFixed(2);
+
+            // Update stats
+            document.getElementById('stat-success').textContent = successful;
+            document.getElementById('stat-failed').textContent = failed;
+            document.getElementById('stat-avg-time').textContent = avgTime.toFixed(2) + 'ms';
+            document.getElementById('stat-throughput').textContent = throughput;
+
+            document.getElementById('stats-grid').style.display = 'grid';
+
+            // Update summary
+            const summary = `
+✅ Kiểm Tra Hoàn Thành!
+
+Tổng Requests: ${testResults.length}
+Thành Công: ${successful}
+Thất Bại: ${failed}
+Tỷ Lệ Thành Công: ${((successful / testResults.length) * 100).toFixed(1)}%
+
+Hiệu Suất:
+  Thời Gian Trung Bình: ${avgTime.toFixed(2)}ms
+  Thời Gian Tối Thiểu: ${Math.min(...testResults.map(r => r.time))}ms
+  Thời Gian Tối Đa: ${Math.max(...testResults.map(r => r.time))}ms
+  Thông Lượng: ${throughput} req/giây
+  Tổng Thời Gian: ${(totalTime / 1000).toFixed(2)}s
+            `;
+
+            document.getElementById('results-summary').textContent = summary;
+            document.getElementById('results-summary').className = '';
+
+            // Request details
+            let requestsOutput = 'ID | Đường Dẫn | Phương Thức | Trạng Thái | Thời Gian (ms)\n';
+            requestsOutput += '---|----------|-------------|-----------|----------------\n';
+            testResults.forEach(r => {
+                const status = r.status || 'LỖI';
+                requestsOutput += `${r.id} | ${r.path} | ${r.method} | ${status} | ${r.time}\n`;
+            });
+            document.getElementById('requests-output').textContent = requestsOutput;
+
+            // Analysis
+            const statusCodes = {};
+            testResults.forEach(r => {
+                const code = r.status || 'LỖI';
+                statusCodes[code] = (statusCodes[code] || 0) + 1;
+            });
+
+            let analysisOutput = 'Phân Bố Mã Trạng Thái:\n';
+            analysisOutput += '-------------------\n';
+            Object.entries(statusCodes).forEach(([code, count]) => {
+                const percent = ((count / testResults.length) * 100).toFixed(1);
+                analysisOutput += `${code}: ${count} (${percent}%)\n`;
+            });
+
+            document.getElementById('analysis-output').textContent = analysisOutput;
+        }
+
+        function switchTab(tabName) {
+            // Ẩn tất cả tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Hiển thị selected tab
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function resetTest() {
+            testResults = [];
+            document.getElementById('results-output').textContent = 'Chạy kiểm tra để xem kết quả...';
+            document.getElementById('requests-output').textContent = 'Chạy kiểm tra để xem requests...';
+            document.getElementById('analysis-output').textContent = 'Chạy kiểm tra để xem phân tích...';
+            document.getElementById('results-summary').textContent = 'Chạy kiểm tra để xem kết quả...';
+            document.getElementById('progress-container').style.display = 'none';
+            document.getElementById('stats-grid').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giới Thiệu - Web Server</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>🚀 Web Server Tĩnh - Đa Luồng</h1>
+            <p class="subtitle">Sử dụng ThreadPoolExecutor để xử lý nhiều client đồng thời</p>
+        </div>
+    </header>
+
+    <nav class="navbar">
+        <div class="container">
+            <ul class="nav-menu">
+                <li><a href="/">Trang Chủ</a></li>
+                <li><a href="/about.html" class="active">Giới Thiệu</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container">
+            <section class="about-intro">
+                <h2>Về Dự Án Này</h2>
+                <p>
+                    Dự án này là một web server tĩnh được viết bằng Python từ đầu, 
+                    không sử dụng bất kỳ framework web nào như Flask hay Django. 
+                    Server sử dụng Socket API ở mức thấp (low-level) và ThreadPoolExecutor 
+                    để xử lý nhiều client đồng thời.
+                </p>
+            </section>
+
+            <section class="architecture">
+                <h2>Kiến Trúc Hệ Thống</h2>
+                
+                <h3>1. Server Architecture</h3>
+                <div class="info-box">
+                    <p>
+                        Server được xây dựng trên nền tảng Socket API của Python. 
+                        Nó lắng nghe trên một port (mặc định 8000) và chấp nhận các kết nối từ clients.
+                    </p>
+                    <pre><code>[Client] --HTTP Request--&gt; [Server Socket]
+         &lt;--HTTP Response-- [ThreadPoolExecutor]
+                    </code></pre>
+                </div>
+
+                <h3>2. Threading Model</h3>
+                <div class="info-box">
+                    <p>
+                        Mỗi client connection được xử lý bởi một thread riêng từ ThreadPoolExecutor. 
+                        Điều này cho phép server xử lý nhiều requests đồng thời mà không block.
+                    </p>
+                    <ul>
+                        <li><strong>Max Workers:</strong> Số thread tối đa (cấu hình trong config.json)</li>
+                        <li><strong>Queue Management:</strong> Requests được queue nếu tất cả threads bận</li>
+                        <li><strong>Graceful Shutdown:</strong> Chờ tất cả threads xong trước khi dừng</li>
+                    </ul>
+                </div>
+
+                <h3>3. HTTP Processing Flow</h3>
+                <div class="info-box">
+                    <ol>
+                        <li>Client kết nối đến server</li>
+                        <li>Server recv HTTP request từ socket</li>
+                        <li>Parse request line (method, path, version)</li>
+                        <li>Validate path (ngăn path traversal)</li>
+                        <li>Resolve đến file trong public/ directory</li>
+                        <li>Đọc file và xác định MIME type</li>
+                        <li>Gửi HTTP response với headers và content</li>
+                        <li>Đóng connection</li>
+                    </ol>
+                </div>
+            </section>
+
+            <section class="features-detail">
+                <h2>Chi Tiết Các Tính Năng</h2>
+
+                <h3>🔒 Bảo Mật - Path Traversal Prevention</h3>
+                <div class="feature-detail">
+                    <p>
+                        Server ngăn chặn các attack cố gắng truy cập file ngoài thư mục public/ 
+                        bằng cách sử dụng normalized paths:
+                    </p>
+                    <pre><code># Reject:
+GET /../../../etc/passwd
+GET /..%2f..%2fetc%2fpasswd
+
+# Accept:
+GET /index.html
+GET /about.html
+                    </code></pre>
+                </div>
+
+                <h3>📊 MIME Type Detection</h3>
+                <div class="feature-detail">
+                    <p>Server tự động xác định MIME type dựa trên file extension:</p>
+                    <table class="info-table">
+                        <tr><td>.html</td><td>text/html; charset=utf-8</td></tr>
+                        <tr><td>.css</td><td>text/css; charset=utf-8</td></tr>
+                        <tr><td>.js</td><td>application/javascript; charset=utf-8</td></tr>
+                        <tr><td>.json</td><td>application/json; charset=utf-8</td></tr>
+                        <tr><td>.png, .jpg, .gif</td><td>image/...</td></tr>
+                        <tr><td>.pdf</td><td>application/pdf</td></tr>
+                    </table>
+                </div>
+
+                <h3>📝 Logging Thread-Safe</h3>
+                <div class="feature-detail">
+                    <p>
+                        Mỗi log entry được bảo vệ bằng threading.Lock để tránh race conditions. 
+                        Logs được ghi vào:
+                    </p>
+                    <ul>
+                        <li>File: logs/server.log (rotating, max 10MB)</li>
+                        <li>Console: Realtime output</li>
+                    </ul>
+                </div>
+
+                <h3>🛑 Graceful Shutdown</h3>
+                <div class="feature-detail">
+                    <p>
+                        Khi nhấn Ctrl+C, server:
+                    </p>
+                    <ol>
+                        <li>Bắt SIGINT signal</li>
+                        <li>Dừng accept kết nối mới</li>
+                        <li>Đợi tất cả threads hoàn thành (với timeout)</li>
+                        <li>Đóng tất cả resources</li>
+                    </ol>
+                </div>
+            </section>
+
+            <section class="code-structure">
+                <h2>Cấu Trúc Code</h2>
+                
+                <h3>server.py</h3>
+                <div class="code-block">
+                    <p><strong>Classes:</strong></p>
+                    <ul>
+                        <li><code>ThreadSafeLogger</code> - Logger với thread-safe protection</li>
+                        <li><code>HTTPServer</code> - Main server class</li>
+                    </ul>
+                    <p><strong>Key Methods:</strong></p>
+                    <ul>
+                        <li><code>start()</code> - Main server loop</li>
+                        <li><code>_handle_client()</code> - Xử lý mỗi client connection</li>
+                        <li><code>_is_safe_path()</code> - Validate path</li>
+                        <li><code>_get_mime_type()</code> - Detect MIME type</li>
+                        <li><code>shutdown()</code> - Graceful shutdown</li>
+                    </ul>
+                </div>
+
+                <h3>client_test.py</h3>
+                <div class="code-block">
+                    <p><strong>Classes:</strong></p>
+                    <ul>
+                        <li><code>HTTPClient</code> - Test client class</li>
+                    </ul>
+                    <p><strong>Key Methods:</strong></p>
+                    <ul>
+                        <li><code>send_request()</code> - Gửi một request</li>
+                        <li><code>test_concurrent()</code> - Test nhiều requests đồng thời</li>
+                        <li><code>_print_results()</code> - Hiển thị kết quả chi tiết</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="performance">
+                <h2>Hiệu Suất</h2>
+                <div class="info-box">
+                    <p>
+                        Với ThreadPoolExecutor, server có thể xử lý hàng chục requests đồng thời. 
+                        Hiệu suất phụ thuộc vào:
+                    </p>
+                    <ul>
+                        <li><strong>max_threads:</strong> Số threads tối đa (default 10)</li>
+                        <li><strong>File size:</strong> Kích thước file được serve</li>
+                        <li><strong>Network bandwidth:</strong> Băng thông mạng</li>
+                        <li><strong>Disk I/O:</strong> Tốc độ đọc disk</li>
+                    </ul>
+                    <p>
+                        Dùng client_test.py để benchmark và xem throughput của server bạn.
+                    </p>
+                </div>
+            </section>
+
+            <section class="future-improvements">
+                <h2>Hướng Phát Triển Trong Tương Lai</h2>
+                <ul>
+                    <li>HTTP/2 và HTTP/3 support</li>
+                    <li>SSL/TLS encryption</li>
+                    <li>Range requests (cho file lớn)</li>
+                    <li>Compression (gzip, brotli)</li>
+                    <li>Caching headers (ETag, Last-Modified)</li>
+                    <li>Virtual hosting</li>
+                    <li>WebSocket support</li>
+                </ul>
+            </section>
+
+            <section class="cta">
+                <h2>Quay Lại Trang Chủ</h2>
+                <p><a href="/" class="btn">← Trang Chủ</a></p>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Web Server Project. Made with ❤️ in Python</p>
+        </div>
+    </footer>
+</body>
+</html>

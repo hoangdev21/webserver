@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Trang Không Tìm Thấy</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        .error-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .error-code {
+            font-size: 120px;
+            font-weight: bold;
+            color: #e74c3c;
+            margin: 0;
+            line-height: 1;
+        }
+        
+        .error-message {
+            font-size: 28px;
+            color: #333;
+            margin: 20px 0;
+        }
+        
+        .error-description {
+            font-size: 16px;
+            color: #666;
+            margin: 20px 0 30px;
+            max-width: 500px;
+        }
+        
+        .error-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-secondary {
+            background-color: #95a5a6;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>🚀 Web Server Tĩnh - Đa Luồng</h1>
+            <p class="subtitle">Sử dụng ThreadPoolExecutor để xử lý nhiều client đồng thời</p>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="error-container">
+                <h1 class="error-code">404</h1>
+                <h2 class="error-message">Trang Không Tìm Thấy</h2>
+                <p class="error-description">
+                    Rất tiếc, trang bạn đang tìm kiếm không tồn tại trên server này. 
+                    Có thể nó đã bị xóa hoặc URL bạn nhập không chính xác.
+                </p>
+                <div class="error-actions">
+                    <a href="/" class="btn">← Quay Lại Trang Chủ</a>
+                    <a href="/about.html" class="btn btn-secondary">Giới Thiệu</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Web Server Project. Made with ❤️ in Python</p>
+        </div>
+    </footer>
+</body>
+</html>

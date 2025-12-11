@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Server Tĩnh - Trang Chủ</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>🚀 Web Server Tĩnh - Đa Luồng</h1>
+            <p class="subtitle">Sử dụng ThreadPoolExecutor để xử lý nhiều client đồng thời</p>
+        </div>
+    </header>
+
+    <nav class="navbar">
+        <div class="container">
+            <ul class="nav-menu">
+                <li><a href="/" class="active">Trang Chủ</a></li>
+                <li><a href="/about.html">Giới Thiệu</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container">
+            <section class="hero">
+                <h2>Chào mừng đến Web Server của tôi!</h2>
+                <p>Đây là một web server tĩnh viết bằng Python với hỗ trợ xử lý đa luồng (Threading).</p>
+            </section>
+
+            <section class="features">
+                <h2>Tính Năng Chính</h2>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3>⚡ Đa Luồng</h3>
+                        <p>Sử dụng ThreadPoolExecutor để xử lý nhiều client đồng thời một cách hiệu quả</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>📁 Serve Static Files</h3>
+                        <p>Phục vụ các file tĩnh như HTML, CSS, JavaScript, hình ảnh từ thư mục public/</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🔒 Bảo Mật</h3>
+                        <p>Ngăn chặn path traversal attack và các lỗ hổng bảo mật phổ biến</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>📊 Logging</h3>
+                        <p>Ghi lại các requests vào file log theo cách thread-safe</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🎯 HTTP Support</h3>
+                        <p>Hỗ trợ GET và HEAD methods với các status codes thích hợp</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🛑 Graceful Shutdown</h3>
+                        <p>Dừng server một cách an toàn khi nhấn Ctrl+C</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="info">
+                <h2>Thông Tin Server</h2>
+                <div class="info-box">
+                    <table class="info-table">
+                        <tr>
+                            <td><strong>Địa chỉ Server:</strong></td>
+                            <td>127.0.0.1:8000</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Max Threads:</strong></td>
+                            <td>10</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Public Directory:</strong></td>
+                            <td>public/</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Log File:</strong></td>
+                            <td>logs/server.log</td>
+                        </tr>
+                        <tr>
+                            <td><strong>HTTP Methods:</strong></td>
+                            <td>GET, HEAD</td>
+                        </tr>
+                        <tr>
+                            <td><strong>MIME Type Detection:</strong></td>
+                            <td>Tự động dựa trên extension</td>
+                        </tr>
+                    </table>
+                </div>
+            </section>
+
+            <section class="quick-start">
+                <h2>Hướng Dẫn Nhanh</h2>
+                <div class="code-block">
+                    <p><strong>1. Chạy Server:</strong></p>
+                    <pre><code>python server.py</code></pre>
+                    
+                    <p><strong>2. Test với Client:</strong></p>
+                    <pre><code>python client_test.py</code></pre>
+                    
+                    <p><strong>3. Truy cập từ Browser:</strong></p>
+                    <pre><code>http://127.0.0.1:8000</code></pre>
+                </div>
+            </section>
+
+            <section class="tech-stack">
+                <h2>Công Nghệ Sử Dụng</h2>
+                <ul class="tech-list">
+                    <li>Python 3.x</li>
+                    <li>Socket API (Low-level networking)</li>
+                    <li>ThreadPoolExecutor (concurrent.futures)</li>
+                    <li>Logging module (Thread-safe)</li>
+                    <li>HTML5 & CSS3</li>
+                </ul>
+            </section>
+
+            <section class="cta">
+                <h2>Tìm Hiểu Thêm</h2>
+                <p>Muốn hiểu rõ hơn về cách hoạt động? Hãy xem trang <a href="/about.html">Giới Thiệu</a></p>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Web Server Project. Made with ❤️ in Python</p>
+        </div>
+    </footer>
+</body>
+</html>
