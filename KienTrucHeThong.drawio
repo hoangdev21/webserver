@@ -1,0 +1,520 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2025-12-11T14:30:00.000Z" agent="5.0" version="13.0" type="device">
+  <diagram id="architecture-diagram" name="Web Server Architecture">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="800" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Title -->
+        <mxCell id="title" value="Web Server Architecture - Client-Server Model" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=20;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="20" width="600" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- SERVER SIDE -->
+        <!-- Server Container -->
+        <mxCell id="server-container" value="HTTP SERVER&#xa;(127.0.0.1:5000)" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#e1d5e7;strokeColor=#9673a6;rounded=0;fontSize=12;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="50" y="100" width="500" height="500" as="geometry" />
+        </mxCell>
+        
+        <!-- Server Main Thread -->
+        <mxCell id="server-main" value="Main Thread&#xa;(Server Socket)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="server-container">
+          <mxGeometry y="40" width="500" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- ThreadPoolExecutor -->
+        <mxCell id="thread-pool" value="ThreadPoolExecutor&#xa;(Max 10 Worker Threads)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d4e6f1;strokeColor=#2874a6;fontSize=11;fontStyle=1;" vertex="1" parent="server-container">
+          <mxGeometry y="110" width="500" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- Worker Threads -->
+        <mxCell id="worker-box" value="Worker Threads" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e8daef;strokeColor=#9673a6;fontSize=11;fontStyle=1;" vertex="1" parent="server-container">
+          <mxGeometry y="190" width="500" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="worker1" value="Thread 1&#xa;Client 1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d7bde2;strokeColor=#7d3c98;fontSize=10;" vertex="1" parent="server-container">
+          <mxGeometry x="10" y="220" width="110" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="worker2" value="Thread 2&#xa;Client 2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d7bde2;strokeColor=#7d3c98;fontSize=10;" vertex="1" parent="server-container">
+          <mxGeometry x="130" y="220" width="110" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="worker3" value="Thread 3&#xa;Client 3" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d7bde2;strokeColor=#7d3c98;fontSize=10;" vertex="1" parent="server-container">
+          <mxGeometry x="250" y="220" width="110" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="worker-dots" value="..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d7bde2;strokeColor=#7d3c98;fontSize=10;" vertex="1" parent="server-container">
+          <mxGeometry x="370" y="220" width="30" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- Components -->
+        <mxCell id="components-box" value="Components &amp; Resources" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e8daef;strokeColor=#9673a6;fontSize=11;fontStyle=1;" vertex="1" parent="server-container">
+          <mxGeometry y="300" width="500" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="logger" value="ThreadSafeLogger&#xa;(logging + Lock)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f9e79f;strokeColor=#d68910;fontSize=10;" vertex="1" parent="server-container">
+          <mxGeometry x="10" y="330" width="140" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="public-dir" value="Public Dir&#xa;/public/*.html" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a9dfbf;strokeColor=#27ae60;fontSize=10;" vertex="1" parent="server-container">
+          <mxGeometry x="170" y="330" width="140" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="config" value="Config.json&#xa;(host, port,&#xa;max_threads)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5cba7;strokeColor=#ba4a00;fontSize=9;" vertex="1" parent="server-container">
+          <mxGeometry x="330" y="330" width="140" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- Logs -->
+        <mxCell id="logs" value="logs/&#xa;server.log" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fadbd8;strokeColor=#c0392b;fontSize=10;" vertex="1" parent="server-container">
+          <mxGeometry x="170" y="410" width="140" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- CLIENT SIDE -->
+        <!-- Client 1: Browser -->
+        <mxCell id="client1-box" value="CLIENT 1: Web Browser&#xa;(127.0.0.1:XXXX)" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;verticalAlign=top;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#d5e8d4;strokeColor=#82b366;rounded=0;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="650" y="100" width="280" height="150" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="client1-content" value="GET /index.html HTTP/1.1&#xa;&#xa;(HTML5 + JavaScript)&#xa;&#xa;Display web content" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e2efda;strokeColor=#82b366;fontSize=10;" vertex="1" parent="client1-box">
+          <mxGeometry y="40" width="280" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- Client 2: Python Test -->
+        <mxCell id="client2-box" value="CLIENT 2: Python Test Client&#xa;(127.0.0.1:YYYY)" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;verticalAlign=top;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#d5e8d4;strokeColor=#82b366;rounded=0;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="650" y="270" width="280" height="150" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="client2-content" value="Multi-threading&#xa;(20 concurrent requests)&#xa;&#xa;Measure response time&#xa;Parse results" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e2efda;strokeColor=#82b366;fontSize=10;" vertex="1" parent="client2-box">
+          <mxGeometry y="40" width="280" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- Client 3: curl -->
+        <mxCell id="client3-box" value="CLIENT 3: Command Line (curl)&#xa;(127.0.0.1:ZZZZ)" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;verticalAlign=top;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#d5e8d4;strokeColor=#82b366;rounded=0;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="650" y="440" width="280" height="150" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="client3-content" value="curl http://127.0.0.1:5000/&#xa;&#xa;Test single request&#xa;&#xa;View response headers&#xa;Debug" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e2efda;strokeColor=#82b366;fontSize=10;" vertex="1" parent="client3-box">
+          <mxGeometry y="40" width="280" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- NETWORK CONNECTIONS -->
+        <!-- Server Main Thread to ThreadPool -->
+        <mxCell id="arrow1" edge="1" parent="1" source="server-main" target="thread-pool">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- ThreadPool to Workers -->
+        <mxCell id="arrow2" edge="1" parent="1" source="thread-pool" target="worker1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow3" edge="1" parent="1" source="thread-pool" target="worker2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow4" edge="1" parent="1" source="thread-pool" target="worker3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Network connections from clients to server -->
+        <!-- Client 1 to Server -->
+        <mxCell id="network1" edge="1" parent="1" source="client1-box" target="worker1" style="strokeWidth=2;strokeColor=#0066cc;dashed=0;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="645" y="175" as="sourcePoint" />
+            <mxPoint x="555" y="250" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Client 2 to Server -->
+        <mxCell id="network2" edge="1" parent="1" source="client2-box" target="worker2" style="strokeWidth=2;strokeColor=#0066cc;dashed=0;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="645" y="345" as="sourcePoint" />
+            <mxPoint x="555" y="250" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Client 3 to Server -->
+        <mxCell id="network3" edge="1" parent="1" source="client3-box" target="worker3" style="strokeWidth=2;strokeColor=#0066cc;dashed=0;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="645" y="515" as="sourcePoint" />
+            <mxPoint x="555" y="250" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Legend -->
+        <mxCell id="legend-title" value="Legend &amp; Protocol" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="640" width="200" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend1" value="→ TCP Connection (HTTP/1.1)" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="50" y="665" width="200" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend2" value="Protocol: HTTP Request/Response" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="50" y="685" width="200" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend3" value="Format: GET /path HTTP/1.1" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="50" y="705" width="200" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend4" value="Port: 5000 (configured in config.json)" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="300" y="665" width="250" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend5" value="Max Threads: 10 (ThreadPoolExecutor)" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="300" y="685" width="250" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend6" value="Concurrent: Multiple clients can connect simultaneously" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="300" y="705" width="400" height="20" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  
+  <!-- DIAGRAM 2: Detailed Request Flow -->
+  <diagram id="request-flow" name="HTTP Request Flow">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="800" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Title -->
+        <mxCell id="title2" value="HTTP Request Processing Flow" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=18;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="20" width="600" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- Flow Steps -->
+        <mxCell id="step1" value="1. Client connects to server&#xa;(127.0.0.1:5000)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="150" y="80" width="300" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="step2" value="2. server_socket.accept()&#xa;Accept connection" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="150" y="160" width="300" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="step3" value="3. executor.submit(xu_ly_client, sock, addr)&#xa;Submit to ThreadPool" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d4e6f1;strokeColor=#2874a6;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="150" y="240" width="300" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="step4" value="4. Worker Thread starts&#xa;(from thread pool)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d7bde2;strokeColor=#7d3c98;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="150" y="320" width="300" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="step5" value="5. sock.recv() - Receive HTTP request&#xa;GET /index.html HTTP/1.1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a9dfbf;strokeColor=#27ae60;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="150" y="400" width="300" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="step6" value="6. Parse request&#xa;method, path, headers" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f9e79f;strokeColor=#d68910;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="150" y="480" width="300" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="step7" value="7. Validate request&#xa;- Check method (GET/POST/HEAD)&#xa;- Check path traversal" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5b7b1;strokeColor=#c0392b;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="150" y="560" width="300" height="70" as="geometry" />
+        </mxCell>
+        
+        <!-- Right side - Response -->
+        <mxCell id="step8" value="8. Read file from public/&#xa;(MIME type detection)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a9dfbf;strokeColor=#27ae60;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="580" y="80" width="300" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="step9" value="9. Build HTTP response header&#xa;HTTP/1.1 200 OK" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f9e79f;strokeColor=#d68910;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="580" y="160" width="300" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="step10" value="10. sock.sendall()&#xa;Send response header + file content" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d4e6f1;strokeColor=#2874a6;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="580" y="240" width="300" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="step11" value="11. Log the request&#xa;(Thread-safe logging)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="580" y="320" width="300" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="step12" value="12. sock.close()&#xa;Close connection" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="580" y="400" width="300" height="60" as="geometry" />
+        </Cell>
+        
+        <mxCell id="step13" value="13. Return to ThreadPool&#xa;Thread available for next task" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d7bde2;strokeColor=#7d3c98;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="580" y="480" width="300" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- Arrows -->
+        <mxCell id="arrow-flow1" edge="1" parent="1" source="step1" target="step2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-flow2" edge="1" parent="1" source="step2" target="step3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-flow3" edge="1" parent="1" source="step3" target="step4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-flow4" edge="1" parent="1" source="step4" target="step5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-flow5" edge="1" parent="1" source="step5" target="step6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-flow6" edge="1" parent="1" source="step6" target="step7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Arrow from left to right -->
+        <mxCell id="arrow-flow-to-right" edge="1" parent="1" source="step7" target="step8">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="500" y="595" as="sourcePoint" />
+            <mxPoint x="580" y="110" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="arrow-flow7" edge="1" parent="1" source="step8" target="step9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-flow8" edge="1" parent="1" source="step9" target="step10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-flow9" edge="1" parent="1" source="step10" target="step11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-flow10" edge="1" parent="1" source="step11" target="step12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-flow11" edge="1" parent="1" source="step12" target="step13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  
+  <!-- DIAGRAM 3: Threading Model -->
+  <diagram id="threading-model" name="Threading Model">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="800" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Title -->
+        <mxCell id="title3" value="ThreadPoolExecutor Model - Concurrent Request Handling" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=18;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="20" width="800" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- Time axis label -->
+        <mxCell id="time-label" value="Time" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="100" width="50" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- Timeline -->
+        <!-- t0 -->
+        <mxCell id="t0-label" value="t0" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="140" y="70" width="40" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- t1 -->
+        <mxCell id="t1-label" value="t1" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="70" width="40" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- t2 -->
+        <mxCell id="t2-label" value="t2" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="460" y="70" width="40" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- t3 -->
+        <mxCell id="t3-label" value="t3" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="620" y="70" width="40" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- Thread lanes -->
+        <mxCell id="thread1-label" value="Thread 1" style="text;html=1;align=right;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="120" width="70" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="thread2-label" value="Thread 2" style="text;html=1;align=right;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="180" width="70" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="thread3-label" value="Thread 3" style="text;html=1;align=right;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="240" width="70" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="thread4-label" value="Thread 4" style="text;html=1;align=right;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="300" width="70" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- Client requests on timeline -->
+        <mxCell id="client1-timeline" value="Client 1 connects&#xa;(GET /)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d7bde2;strokeColor=#7d3c98;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="130" y="110" width="100" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="client2-timeline" value="Client 2 connects&#xa;(GET /about.html)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d7bde2;strokeColor=#7d3c98;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="250" y="170" width="100" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="client3-timeline" value="Client 3 connects&#xa;(GET /style.css)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d7bde2;strokeColor=#7d3c98;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="370" y="230" width="100" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="client4-timeline" value="Client 4 connects&#xa;(GET /)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d7bde2;strokeColor=#7d3c98;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="490" y="110" width="100" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="client1-finish" value="Client 1 closes" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a9dfbf;strokeColor=#27ae60;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="370" y="110" width="80" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="client2-finish" value="Client 2 closes" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a9dfbf;strokeColor=#27ae60;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="490" y="170" width="80" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- Thread pool queue -->
+        <mxCell id="queue-title" value="ThreadPoolExecutor Queue:" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="130" y="380" width="200" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="queue-status" value="Max 10 worker threads&#xa;When all busy → queue tasks&#xa;When thread free → process next task" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="130" y="410" width="350" height="70" as="geometry" />
+        </mxCell>
+        
+        <!-- Synchronization -->
+        <mxCell id="sync-title" value="Thread Synchronization:" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="130" y="510" width="200" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="sync1" value="Lock: Protect shared resources (logger, test_results)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e2efda;strokeColor=#82b366;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="130" y="540" width="350" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="sync2" value="Event: Graceful shutdown signal" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e2efda;strokeColor=#82b366;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="130" y="580" width="350" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="sync3" value="Executor.shutdown(wait=True): Wait for all tasks" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e2efda;strokeColor=#82b366;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="130" y="620" width="350" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- Benefits -->
+        <mxCell id="benefits-title" value="Benefits of ThreadPoolExecutor:" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="550" y="380" width="250" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="benefit1" value="✓ Reuse threads (no create/destroy overhead)" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="550" y="410" width="300" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="benefit2" value="✓ Limit threads (prevent resource exhaustion)" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="550" y="435" width="300" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="benefit3" value="✓ Automatic queue management" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="550" y="460" width="300" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="benefit4" value="✓ Handles many concurrent connections" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="550" y="485" width="300" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="benefit5" value="✓ Simple graceful shutdown" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="550" y="510" width="300" height="20" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  
+  <!-- DIAGRAM 4: Protocol Details -->
+  <diagram id="protocol-details" name="HTTP Protocol Details">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="800" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Title -->
+        <mxCell id="title4" value="HTTP Request-Response Protocol" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=18;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="20" width="800" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- REQUEST -->
+        <mxCell id="req-title" value="HTTP REQUEST (Client → Server)" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="80" width="450" height="25" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="req-example" value="GET /index.html HTTP/1.1\r\nHost: 127.0.0.1:5000\r\nUser-Agent: Mozilla/5.0\r\nConnection: close\r\n\r\n" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d4e6f1;strokeColor=#2874a6;fontSize=10;align=left;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="50" y="115" width="450" height="100" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="req-parts" value="Request Parts:&#xa;1. Request Line: METHOD PATH VERSION&#xa;2. Headers: key: value pairs&#xa;3. Empty line (CRLF)&#xa;4. Body (optional)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e2efda;strokeColor=#82b366;fontSize=10;align=left;" vertex="1" parent="1">
+          <mxGeometry x="50" y="225" width="450" height="90" as="geometry" />
+        </mxCell>
+        
+        <!-- RESPONSE -->
+        <mxCell id="resp-title" value="HTTP RESPONSE (Server → Client)" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="550" y="80" width="450" height="25" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="resp-example" value="HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: 1024\r\nConnection: close\r\n\r\n&lt;html&gt;...&lt;/html&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f9e79f;strokeColor=#d68910;fontSize=10;align=left;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="550" y="115" width="450" height="100" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="resp-parts" value="Response Parts:&#xa;1. Status Line: VERSION CODE MESSAGE&#xa;2. Headers: key: value pairs&#xa;3. Empty line (CRLF)&#xa;4. Body (file content)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e2efda;strokeColor=#82b366;fontSize=10;align=left;" vertex="1" parent="1">
+          <mxGeometry x="550" y="225" width="450" height="90" as="geometry" />
+        </mxCell>
+        
+        <!-- HTTP METHODS -->
+        <mxCell id="methods-title" value="HTTP Methods Supported" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="350" width="200" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="get-method" value="GET /path HTTP/1.1&#xa;→ Retrieve resource&#xa;→ Returns full response" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d7bde2;strokeColor=#7d3c98;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="50" y="380" width="200" height="70" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="head-method" value="HEAD /path HTTP/1.1&#xa;→ Like GET but no body&#xa;→ Check if resource exists" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d7bde2;strokeColor=#7d3c98;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="270" y="380" width="200" height="70" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="post-method" value="POST /api/test-results HTTP/1.1&#xa;→ Submit data&#xa;→ API endpoint" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d7bde2;strokeColor=#7d3c98;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="490" y="380" width="200" height="70" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="unsupported" value="PUT, DELETE, PATCH...&#xa;→ Not supported&#xa;→ Return 405 Method Not Allowed" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fadbd8;strokeColor=#c0392b;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="710" y="380" width="200" height="70" as="geometry" />
+        </mxCell>
+        
+        <!-- STATUS CODES -->
+        <mxCell id="status-title" value="HTTP Status Codes" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="490" width="200" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="status-2xx" value="2xx Success&#xa;200 OK - File found&#xa;304 Not Modified" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a9dfbf;strokeColor=#27ae60;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="50" y="520" width="150" height="70" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="status-4xx" value="4xx Client Error&#xa;400 Bad Request&#xa;403 Forbidden&#xa;404 Not Found&#xa;405 Method Not Allowed" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5cba7;strokeColor=#ba4a00;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="220" y="520" width="180" height="70" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="status-5xx" value="5xx Server Error&#xa;500 Internal Error&#xa;503 Unavailable&#xa;504 Gateway Timeout" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fadbd8;strokeColor=#c0392b;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="420" y="520" width="180" height="70" as="geometry" />
+        </mxCell>
+        
+        <!-- MIME TYPES -->
+        <mxCell id="mime-title" value="MIME Types Detected" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="650" y="490" width="200" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="mime-list" value=".html → text/html; charset=utf-8&#xa;.css → text/css; charset=utf-8&#xa;.js → application/javascript&#xa;.json → application/json&#xa;.png/.jpg → image/*&#xa;.pdf → application/pdf" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=9;align=left;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="650" y="520" width="280" height="110" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
