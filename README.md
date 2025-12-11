@@ -68,37 +68,93 @@ python client_test.py
 # ...
 ```
 
-### 4. Truy Cập từ Browser
+### 4. Truy Cập từ Browser (máy cục bộ)
 
 ```
-http://127.0.0.1:8000
-http://127.0.0.1:8000/about.html
-http://127.0.0.1:8000/notfound.html  (404 error)
+http://127.0.0.1:5000
+http://127.0.0.1:5000/about.html
+http://127.0.0.1:5000/notfound.html  (404 error)
 ```
+
+### 5. Truy Cập từ Máy Khác (cùng mạng)
+
+#### Bước 1: Tìm IP Address của máy server
+```powershell
+ipconfig
+```
+Tìm **IPv4 Address** (ví dụ: `192.168.1.100`)
+
+#### Bước 2: Cho phép Firewall
+```powershell
+netsh advfirewall firewall add rule name="Web Server Port 5000" dir=in action=allow protocol=tcp localport=5000
+```
+
+#### Bước 3: Chạy server trên máy A
+```bash
+python server.py
+```
+
+#### Bước 4: Truy cập từ máy B
+Mở browser trên máy khác và nhập:
+```
+http://192.168.1.100:5000
+http://192.168.1.100:5000/about.html
+```
+
+**Ghi chú:**
+- Thay `192.168.1.100` bằng IP thực tế của máy server
+- Cả hai máy phải kết nối cùng mạng WiFi hoặc mạng LAN
+- Port `5000` phải được mở trong Firewall
 
 ## ⚙️ Cấu Hình (config.json)
 
 ```json
 {
-  "host": "127.0.0.1",
-  "port": 8000,
+  "host": "0.0.0.0",
+  "port": 5000,
   "max_threads": 10,
   "public_dir": "public",
   "log_file": "logs/server.log",
   "timeout": 30,
-  "chunk_size": 8192
+  "chunk_size": 8192,
+  "failure_rate": 0.1,
+  "enable_failure_simulation": true
 }
 ```
 
 | Tham số | Giải Thích |
 |---------|-----------|
 | `host` | Địa chỉ IP server (localhost hoặc 0.0.0.0) |
-| `port` | Port lắng nghe (default 8000) |
+| `port` | Port lắng nghe (default 5000) |
 | `max_threads` | Số thread tối đa trong pool (default 10) |
 | `public_dir` | Thư mục phục vụ static files |
 | `log_file` | Đường dẫn file log |
 | `timeout` | Timeout cho socket (giây) |
 | `chunk_size` | Kích thước chunk khi đọc file (bytes) |
+| `failure_rate` | Tỉ lệ thất bại của request (0.0 - 1.0). VD: 0.1 = 10% |
+| `enable_failure_simulation` | Bật/tắt mô phỏng thất bại |
+
+### 🔴 Failure Simulation
+
+Để test cách ứng dụng xử lý khi server gặp lỗi, bạn có thể bật failure simulation:
+
+```json
+{
+  "enable_failure_simulation": true,
+  "failure_rate": 0.2
+}
+```
+
+Khi bật, một số requests sẽ trả về các error status codes:
+- **500 Internal Server Error** - Lỗi server nội bộ
+- **503 Service Unavailable** - Dịch vụ không khả dụng
+- **504 Gateway Timeout** - Timeout kết nối
+
+**Ví dụ:**
+- `failure_rate: 0.1` → 10% requests thất bại
+- `failure_rate: 0.3` → 30% requests thất bại
+- `failure_rate: 0` → Không có failures (disable simulation)
+- `enable_failure_simulation: false` → Tắt hoàn toàn feature này
 
 ## 📝 Cách Hoạt Động
 

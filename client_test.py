@@ -23,283 +23,156 @@ class HTTPClient:
     """Client để test HTTP Server"""
     
     def __init__(self, host='127.0.0.1', port=8000):
-        """
-        Khởi tạo client
-        
-        Args:
-            host (str): Địa chỉ server
-            port (int): Port server
-        """
+        """Khởi tạo client"""
         self.host = host
         self.port = port
-        self.base_url = f'http://{host}:{port}'
-        
-        # Lưu kết quả
         self.results = []
         self._lock = threading.Lock()
     
-    def send_request(self, path='/', method='GET', request_id=0):
-        """
-        Gửi HTTP request và nhận response
-        
-        Args:
-            path (str): Đường dẫn request
-            method (str): HTTP method (GET, HEAD)
-            request_id (int): ID của request (để tracking)
-        
-        Returns:
-            dict: Thông tin response
-        """
+    def gui_request(self, path='/', method='GET', request_id=0):
+        """Gửi HTTP request và nhận response"""
         start_time = time.time()
-        result = {
-            'request_id': request_id,
-            'path': path,
-            'method': method,
-            'status_code': None,
-            'response_time': None,
-            'content_length': 0,
-            'error': None,
-            'success': False,
-        }
-        
+        result = {'request_id': request_id, 'path': path, 'method': method, 
+                 'status_code': None, 'response_time': None, 'content_length': 0,
+                 'error': None, 'success': False}
         try:
-            # Tạo socket
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.settimeout(10)
-            
-            # Kết nối đến server
             sock.connect((self.host, self.port))
             
-            # Gửi HTTP request
-            request = f'{method} {path} HTTP/1.1\r\nHost: {self.host}:{self.port}\r\nConnection: close\r\n\r\n'
-            sock.sendall(request.encode('utf-8'))
+            req = f'{method} {path} HTTP/1.1\r\nHost: {self.host}:{self.port}\r\nConnection: close\r\n\r\n'
+            sock.sendall(req.encode('utf-8'))
             
-            # Nhận response header
-            response_data = b''
+            resp_data = b''
             while True:
                 chunk = sock.recv(4096)
-                if not chunk:
-                    break
-                response_data += chunk
-            
+                if not chunk: break
+                resp_data += chunk
             sock.close()
             
-            # Parse response
-            if response_data:
-                response_str = response_data.decode('utf-8', errors='ignore')
-                lines = response_str.split('\r\n')
-                
+            if resp_data:
+                resp_str = resp_data.decode('utf-8', errors='ignore')
+                lines = resp_str.split('\r\n')
                 if lines:
-                    # Parse status line
-                    status_line = lines[0]
-                    parts = status_line.split(' ')
+                    parts = lines[0].split(' ')
                     if len(parts) >= 2:
                         result['status_code'] = int(parts[1])
                         result['success'] = True
-                    
-                    # Tìm Content-Length
                     for line in lines[1:]:
                         if line.lower().startswith('content-length:'):
                             try:
                                 result['content_length'] = int(line.split(':')[1].strip())
-                            except:
-                                pass
+                            except: pass
                             break
-            
+        
         except socket.timeout:
             result['error'] = 'Timeout'
         except ConnectionRefusedError:
-            result['error'] = 'Kết nối bị từ chối'
+            result['error'] = 'Kết nối từ chối'
         except Exception as e:
             result['error'] = str(e)
-        
         finally:
-            result['response_time'] = (time.time() - start_time) * 1000  # milliseconds
+            result['response_time'] = (time.time() - start_time) * 1000
         
-        # Lưu result
         with self._lock:
             self.results.append(result)
-        
         return result
     
     def test_concurrent(self, num_requests=20, paths=None):
-        """
-        Test gửi nhiều requests đồng thời
-        
-        Args:
-            num_requests (int): Số requests
-            paths (list): Danh sách paths để request
-        """
+        """Test gửi nhiều requests đồng thời"""
         if paths is None:
             paths = ['/', '/about.html', '/style.css']
         
         self.results = []
-        
         print('=' * 70)
         print(f'TEST THREADING - Gửi {num_requests} requests đồng thời')
-        print('=' * 70)
-        print()
+        print('=' * 70 + '\n')
         
         start_time = time.time()
-        
-        # Sử dụng ThreadPoolExecutor
-        with ThreadPoolExecutor(max_workers=10, thread_name_prefix='TestClient') as executor:
-            futures = []
-            
-            for i in range(num_requests):
-                path = paths[i % len(paths)]
-                future = executor.submit(self.send_request, path, 'GET', i + 1)
-                futures.append(future)
-            
-            # Đợi tất cả requests xong
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            futures = [executor.submit(self.gui_request, paths[i % len(paths)], 'GET', i + 1) 
+                      for i in range(num_requests)]
             for future in as_completed(futures):
                 try:
                     future.result()
                 except Exception as e:
                     print(f'Lỗi: {e}')
         
-        total_time = time.time() - start_time
-        
-        # Hiển thị kết quả
-        self._print_results(total_time)
-        
-        # Gửi kết quả lên server
-        self._send_results_to_server()
+        self.hien_thi_ket_qua(time.time() - start_time)
+        self.gui_ket_qua_api()
     
-    def _print_results(self, total_time):
-        """
-        Hiển thị kết quả test
-        
-        Args:
-            total_time (float): Tổng thời gian test
-        """
+    def hien_thi_ket_qua(self, total_time):
+        """Hiển thị kết quả test"""
         if not self.results:
             print('Không có kết quả')
             return
         
-        # Phân loại kết quả
-        success_results = [r for r in self.results if r['success']]
-        failed_results = [r for r in self.results if not r['success']]
+        success = [r for r in self.results if r['success']]
+        failed = [r for r in self.results if not r['success']]
         
         print('KẾT QUẢ CHI TIẾT:')
         print('-' * 70)
-        print(f'{"ID":<5} {"Path":<20} {"Method":<8} {"Status":<8} {"Time(ms)":<10} {"Size":<10}')
+        print(f'{"ID":<5} {"Path":<20} {"Method":<8} {"Status":<8} {"Time(ms)":<10}')
         print('-' * 70)
         
-        for result in sorted(self.results, key=lambda x: x['request_id']):
-            status = str(result['status_code']) if result['status_code'] else 'ERROR'
-            error = f" ({result['error']})" if result['error'] else ""
-            size = result['content_length']
-            
-            print(
-                f"{result['request_id']:<5} "
-                f"{result['path']:<20} "
-                f"{result['method']:<8} "
-                f"{status:<8} "
-                f"{result['response_time']:<10.2f} "
-                f"{size:<10}{error}"
-            )
+        for r in sorted(self.results, key=lambda x: x['request_id']):
+            status = str(r['status_code']) if r['status_code'] else 'ERROR'
+            err = f" ({r['error']})" if r['error'] else ""
+            print(f"{r['request_id']:<5} {r['path']:<20} {r['method']:<8} {status:<8} {r['response_time']:<10.2f}{err}")
         
-        print('-' * 70)
-        print()
-        
-        # Thống kê
+        print('-' * 70 + '\n')
         print('THỐNG KÊ:')
         print('-' * 70)
-        print(f'Tổng requests: {len(self.results)}')
-        print(f'Thành công: {len(success_results)}')
-        print(f'Thất bại: {len(failed_results)}')
-        print(f'Tỷ lệ thành công: {len(success_results) / len(self.results) * 100:.1f}%')
+        print(f'Tổng: {len(self.results)} | Thành công: {len(success)} | Thất bại: {len(failed)}')
+        print(f'Tỷ lệ: {len(success) / len(self.results) * 100:.1f}%')
         print()
         
-        if success_results:
-            response_times = [r['response_time'] for r in success_results]
-            content_lengths = [r['content_length'] for r in success_results]
-            
-            print(f'Thời gian response:')
-            print(f'  Min: {min(response_times):.2f} ms')
-            print(f'  Max: {max(response_times):.2f} ms')
-            print(f'  Avg: {statistics.mean(response_times):.2f} ms')
-            print(f'  Median: {statistics.median(response_times):.2f} ms')
-            print(f'  StdDev: {statistics.stdev(response_times):.2f} ms' if len(response_times) > 1 else '')
+        if success:
+            times = [r['response_time'] for r in success]
+            sizes = [r['content_length'] for r in success]
+            print(f'Thời gian: Min={min(times):.2f}ms | Max={max(times):.2f}ms | Avg={statistics.mean(times):.2f}ms')
+            print(f'Dữ liệu: Tổng={sum(sizes)} bytes | Avg={statistics.mean(sizes):.0f} bytes')
+            print(f'Throughput: {len(success) / total_time:.2f} req/s')
             print()
             
-            total_size = sum(content_lengths)
-            print(f'Kích thước dữ liệu:')
-            print(f'  Tổng: {total_size} bytes')
-            print(f'  Avg: {statistics.mean(content_lengths):.0f} bytes')
-            print()
-        
-        print(f'Thời gian tổng cộng: {total_time:.2f} giây')
-        print(f'Throughput: {len(success_results) / total_time:.2f} requests/giây')
-        print()
-        
-        # Phân tích status code
-        if success_results:
-            status_codes = {}
-            for r in success_results:
+            codes = {}
+            for r in success:
                 code = r['status_code']
-                status_codes[code] = status_codes.get(code, 0) + 1
-            
-            print('Phân bố Status Code:')
-            for code in sorted(status_codes.keys()):
-                count = status_codes[code]
-                print(f'  {code}: {count}')
-            print()
+                codes[code] = codes.get(code, 0) + 1
+            print('Status codes:', codes)
         
         print('=' * 70)
     
-    def _send_results_to_server(self):
-        """
-        Gửi kết quả test lên server qua API
-        """
+    def gui_ket_qua_api(self):
+        """Gửi kết quả test lên server qua API"""
         try:
-            # Chuẩn bị dữ liệu
-            data = {
-                'timestamp': datetime.now().isoformat(),
-                'total_requests': len(self.results),
-                'results': self.results
-            }
+            data = {'timestamp': datetime.now().isoformat(), 'total_requests': len(self.results), 'results': self.results}
+            json_bytes = json.dumps(data).encode('utf-8')
             
-            # Convert thành JSON
-            json_data = json.dumps(data)
-            json_bytes = json_data.encode('utf-8')
+            req = (f'POST /api/test-results HTTP/1.1\r\n'
+                   f'Host: {self.host}:{self.port}\r\n'
+                   f'Content-Type: application/json\r\n'
+                   f'Content-Length: {len(json_bytes)}\r\n'
+                   f'Connection: close\r\n\r\n')
             
-            # Tạo HTTP request
-            request = (
-                f'POST /api/test-results HTTP/1.1\r\n'
-                f'Host: {self.host}:{self.port}\r\n'
-                f'Content-Type: application/json\r\n'
-                f'Content-Length: {len(json_bytes)}\r\n'
-                f'Connection: close\r\n\r\n'
-            )
-            
-            # Gửi request
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.settimeout(10)
             sock.connect((self.host, self.port))
-            sock.sendall(request.encode('utf-8'))
-            sock.sendall(json_bytes)
+            sock.sendall(req.encode('utf-8') + json_bytes)
             
-            # Nhận response
-            response_data = b''
+            resp = b''
             while True:
                 chunk = sock.recv(4096)
-                if not chunk:
-                    break
-                response_data += chunk
-            
+                if not chunk: break
+                resp += chunk
             sock.close()
             
-            # Parse response
-            response_str = response_data.decode('utf-8', errors='ignore')
-            if '200 OK' in response_str:
-                print('✓ Đã gửi kết quả test lên server')
+            if '200 OK' in resp.decode('utf-8', errors='ignore'):
+                print('✓ Gửi kết quả thành công')
             else:
-                print('✗ Lỗi gửi kết quả test lên server')
-        
+                print('✗ Gửi kết quả thất bại')
         except Exception as e:
-            print(f'✗ Lỗi kết nối API server: {e}')
+            print(f'✗ Lỗi API: {e}')
 
 
 # ============================================================================
@@ -308,58 +181,36 @@ class HTTPClient:
 
 def main():
     """Chạy test"""
-    # Cấu hình test
-    HOST = '127.0.0.1'
-    PORT = 5000
-    NUM_REQUESTS = 20
+    HOST, PORT, NUM_REQUESTS = '127.0.0.1', 5000, 20
+    paths = ['/', '/index.html', '/about.html', '/style.css', '/404.html', '/notfound.html']
     
-    # Các paths để test
-    paths = [
-        '/',
-        '/index.html',
-        '/about.html',
-        '/style.css',
-        '/404.html',
-        '/notfound.html',  # Test 404
-    ]
-    
-    # Tạo client
     client = HTTPClient(HOST, PORT)
     
-    # Test 1: Kiểm tra server có online không
     print('Kiểm tra kết nối server...')
     try:
-        result = client.send_request('/', 'GET', 0)
+        result = client.gui_request('/', 'GET', 0)
         if result['success']:
-            print(f'✓ Server online tại http://{HOST}:{PORT}')
-            print()
+            print(f'✓ Server online tại http://{HOST}:{PORT}\n')
         else:
-            print(f'✗ Server không phản hồi: {result["error"]}')
-            print('Vui lòng chạy server trước: python server.py')
+            print(f'✗ Server lỗi: {result["error"]}\nChạy: python server.py')
             return
     except Exception as e:
-        print(f'✗ Lỗi kết nối: {e}')
+        print(f'✗ Lỗi: {e}')
         return
     
-    # Test 2: Test threading
     client.test_concurrent(NUM_REQUESTS, paths)
     
-    # Test 3: Test individual paths
-    print('TEST CÁC PATHS RIÊNG LẺ:')
+    print('\nTEST PATHS RIÊNG:')
     print('-' * 70)
-    
     client.results = []
     for path in paths:
-        client.send_request(path, 'GET', 0)
+        client.gui_request(path, 'GET', 0)
     
-    for result in client.results:
-        status = 'OK' if result['success'] else 'FAIL'
-        print(f'{status}: {result["path"]} - '
-              f'Status: {result["status_code"] or "ERROR"} - '
-              f'Time: {result["response_time"]:.2f}ms')
+    for r in client.results:
+        status = 'OK' if r['success'] else 'FAIL'
+        print(f'{status}: {r["path"]} - Status: {r["status_code"] or "ERR"} - Time: {r["response_time"]:.2f}ms')
     
-    print()
-    print('Test hoàn thành!')
+    print('\nHoàn thành!')
 
 
 if __name__ == '__main__':

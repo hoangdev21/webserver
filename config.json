@@ -5,5 +5,7 @@
   "public_dir": "public",
   "log_file": "logs/server.log",
   "timeout": 30,
-  "chunk_size": 8192
+  "chunk_size": 8192,
+  "failure_rate": 0.1,
+  "enable_failure_simulation": true
 }
