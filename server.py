@@ -295,6 +295,14 @@ class HTTPServer:
                 # Parse URL
                 parsed = urlparse(path)
                 file_path = unquote(parsed.path)
+
+                # Accept trailing slash on file URLs (e.g., /client.html/) by stripping it
+                if file_path != '/' and file_path.endswith('/'):
+                    candidate = file_path.rstrip('/')
+                    candidate_full = self.public_dir / candidate.lstrip('/')
+                    if candidate_full.exists() and candidate_full.is_file():
+                        self.logger.debug(f'Normalizing trailing slash for {file_path} -> {candidate}')
+                        file_path = candidate
                 
                 # Xử lý API
                 if file_path.startswith('/api/'):

@@ -25,7 +25,7 @@ from datetime import datetime
 class HTTPClient:
     """Client để test HTTP Server"""
     
-    def __init__(self, host='127.0.0.1', port=8000, timeout=10, inject_failure_rate=0.0):
+    def __init__(self, host='locahost', port=8000, timeout=10, inject_failure_rate=0.0):
         """Khởi tạo client
 
         Args:
@@ -284,7 +284,7 @@ def main():
       --send-api (post results to /api/test-results)
     """
     parser = argparse.ArgumentParser(description='Client test runner (compatible with web client parameters)')
-    parser.add_argument('--host', default='127.0.0.1')
+    parser.add_argument('--host', default='localhost')
     parser.add_argument('--port', default=5000, type=int)
     parser.add_argument('--num-requests', default=20, type=int)
     parser.add_argument('--concurrency', default=5, type=int)
