@@ -310,7 +310,7 @@ header p {
     overflow: hidden;
 }
 
-.card:hover {
+.card:not(.no-hover):hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
     border-color: rgba(14, 165, 233, 0.2);
@@ -369,10 +369,120 @@ header p {
     transition: var(--transition);
 }
 
-.card:hover .card-icon {
+.card:not(.no-hover):hover .card-icon {
     opacity: 0.2;
     transform: scale(1.1);
 }
+
+/* Dashboard specific styles */
+.dashboard .card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    box-shadow: none;
+    padding: 18px;
+    border-radius: 12px;
+}
+
+.large-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(2,6,23,0.04);
+}
+
+.large-card h2 { margin-top: 0; }
+
+.request-list {
+    max-height: 220px;
+    overflow: auto;
+    padding-right: 6px;
+}
+
+/* Results summary (one-line-per-metric, professional) */
+.results-summary {
+    padding: 14px;
+    border-radius: 10px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.5));
+    border: 1px solid var(--card-border);
+    font-family: 'Inter', sans-serif;
+    color: var(--text-primary);
+}
+.results-summary h3 {
+    margin: 0 0 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.results-summary .summary-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 0;
+    border-bottom: 1px dashed rgba(15,23,42,0.04);
+}
+.results-summary .summary-row:last-child { border-bottom: none; }
+.results-summary .label {
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+.results-summary .value {
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+
+.request-item {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+}
+
+.request-item .request-method {
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+}
+
+/* Make stat boxes non-hover by default on dashboard — use `.no-hover` to disable hover */
+.stat-box:not(.no-hover) {
+    transition: var(--transition);
+}
+
+.log-container {
+    max-height: 220px;
+    overflow: auto;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: rgba(15,23,42,0.02);
+    border: 1px solid var(--card-border);
+}
+
+.log-line {
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.03);
+    font-size: 0.9rem;
+}
+
+/* Badges */
+.badge {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: #fff;
+}
+
+.badge-success { background: var(--accent-success); }
+.badge-danger { background: var(--accent-danger); }
 
 /* ============================================================================
    FORMS & INPUTS
@@ -676,7 +786,7 @@ button:disabled {
     transition: var(--transition);
 }
 
-.stat-box:hover {
+.stat-box:not(.no-hover):hover {
     background: rgba(15, 23, 42, 0.08);
     transform: translateY(-2px);
 }
@@ -1099,6 +1209,105 @@ footer {
 
 .btn-refresh:active {
     transform: translateY(0);
+}
+
+/* ---------------------------------------------------------------------------
+   ABOUT PAGE - EFFECT ENHANCEMENTS
+   --------------------------------------------------------------------------- */
+
+.about-intro, .architecture, .features-detail, .code-structure, .performance, .future-improvements, .cta {
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeUp 0.6s ease-out forwards;
+    animation-delay: var(--anim-delay, 0s);
+}
+
+.about-intro { --anim-delay: 0s; }
+.architecture { --anim-delay: 0.08s; }
+.features-detail { --anim-delay: 0.16s; }
+.code-structure { --anim-delay: 0.24s; }
+.performance { --anim-delay: 0.32s; }
+.future-improvements { --anim-delay: 0.4s; }
+.cta { --anim-delay: 0.48s; }
+
+@keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Header accent animation */
+header::after {
+    content: '';
+    position: absolute;
+    inset: -40% -40% auto -40%;
+    height: 220px;
+    background: radial-gradient(ellipse at 10% 10%, rgba(14,165,233,0.08), transparent 20%),
+                radial-gradient(ellipse at 90% 40%, rgba(99,102,241,0.06), transparent 25%);
+    transform: translateX(-20%);
+    filter: blur(30px);
+    z-index: 0;
+    animation: float 8s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes float {
+    0% { transform: translateX(-10%) translateY(0) rotate(0deg); }
+    50%{ transform: translateX(10%) translateY(-6px) rotate(1deg); }
+    100%{ transform: translateX(-10%) translateY(0) rotate(0deg); }
+}
+
+header > .container { position: relative; z-index: 1; }
+
+/* CTA button more emphasis */
+.cta .btn {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.cta .btn:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 12px 30px rgba(14,165,233,0.18);
+}
+
+/* Info table hover & zebra */
+.info-table tr {
+    transition: background 0.25s ease, transform 0.2s ease;
+}
+.info-table tr:nth-child(odd) td { background: rgba(15,23,42,0.02); }
+.info-table tr:hover td {
+    background: linear-gradient(90deg, rgba(14,165,233,0.05), rgba(99,102,241,0.03));
+    transform: translateX(4px);
+}
+
+/* Code-block subtle glow on hover */
+.code-block:hover {
+    box-shadow: 0 12px 40px rgba(14,165,233,0.08);
+    transform: translateY(-4px);
+}
+
+/* Future improvements - stagger list reveal */
+.future-improvements ul li {
+    opacity: 0;
+    transform: translateX(-6px);
+    animation: listFade 0.5s forwards;
+    animation-delay: calc(0.08s * var(--li-index));
+}
+.future-improvements ul li:nth-child(1) { --li-index: 1; }
+.future-improvements ul li:nth-child(2) { --li-index: 2; }
+.future-improvements ul li:nth-child(3) { --li-index: 3; }
+.future-improvements ul li:nth-child(4) { --li-index: 4; }
+.future-improvements ul li:nth-child(5) { --li-index: 5; }
+.future-improvements ul li:nth-child(6) { --li-index: 6; }
+.future-improvements ul li:nth-child(7) { --li-index: 7; }
+
+@keyframes listFade {
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* Small screens: reduce animation distances */
+@media (max-width: 768px) {
+    .about-intro, .architecture, .features-detail, .code-structure, .performance, .future-improvements, .cta {
+        transform: translateY(6px);
+    }
+    header::after { height: 140px; filter: blur(22px); }
 }
 
 /* ============================================================================

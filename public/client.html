@@ -18,7 +18,7 @@
 
         <div class="main-content">
             <!-- Test Configuration Panel -->
-            <div class="card">
+            <div class="card no-hover">
                 <h2>⚙️ Cấu Hình Kiểm Tra</h2>
 
                 <div class="info-box">
@@ -72,7 +72,7 @@
             </div>
 
             <!-- Kết Quả Tóm Tắt -->
-            <div class="card">
+            <div class="card no-hover">
                 <h2>📊 Kết Quả Kiểm Tra</h2>
 
                 <div id="results-summary" class="results-empty">
@@ -335,25 +335,25 @@
 
             document.getElementById('stats-grid').style.display = 'grid';
 
-            // Update summary
-            const summary = `
-✅ Kiểm Tra Hoàn Thành!
-
-Tổng Requests: ${testResults.length}
-Thành Công: ${successful}
-Thất Bại: ${failed}
-Tỷ Lệ Thành Công: ${((successful / testResults.length) * 100).toFixed(1)}%
-
-Hiệu Suất:
-  Thời Gian Trung Bình: ${avgTime.toFixed(2)}ms
-  Thời Gian Tối Thiểu: ${Math.min(...testResults.map(r => r.time))}ms
-  Thời Gian Tối Đa: ${Math.max(...testResults.map(r => r.time))}ms
-  Thông Lượng: ${throughput} req/giây
-  Tổng Thời Gian: ${(totalTime / 1000).toFixed(2)}s
+            // Update summary (structured and one-line-per-metric)
+            const summaryHtml = `
+              <div class="summary">
+                <h3>✅ Kiểm Tra Hoàn Thành!</h3>
+                <div class="summary-row"><span class="label">Tổng Requests</span><span class="value">${testResults.length}</span></div>
+                <div class="summary-row"><span class="label">Thành Công</span><span class="value">${successful}</span></div>
+                <div class="summary-row"><span class="label">Thất Bại</span><span class="value">${failed}</span></div>
+                <div class="summary-row"><span class="label">Tỷ Lệ Thành Công</span><span class="value">${((successful / testResults.length) * 100).toFixed(1)}%</span></div>
+                <hr style="border:none;border-top:1px solid rgba(15,23,42,0.04);margin:8px 0;">
+                <div class="summary-row"><span class="label">Thời Gian Trung Bình</span><span class="value">${avgTime.toFixed(2)} ms</span></div>
+                <div class="summary-row"><span class="label">Thời Gian Tối Thiểu</span><span class="value">${Math.min(...testResults.map(r => r.time))} ms</span></div>
+                <div class="summary-row"><span class="label">Thời Gian Tối Đa</span><span class="value">${Math.max(...testResults.map(r => r.time))} ms</span></div>
+                <div class="summary-row"><span class="label">Thông Lượng</span><span class="value">${throughput} req/s</span></div>
+                <div class="summary-row"><span class="label">Tổng Thời Gian</span><span class="value">${(totalTime / 1000).toFixed(2)} s</span></div>
+              </div>
             `;
 
-            document.getElementById('results-summary').textContent = summary;
-            document.getElementById('results-summary').className = '';
+            document.getElementById('results-summary').innerHTML = summaryHtml;
+            document.getElementById('results-summary').className = 'results-summary';
 
             // Request details
             let requestsOutput = 'ID | Đường Dẫn | Phương Thức | Trạng Thái | Thời Gian (ms)\n';

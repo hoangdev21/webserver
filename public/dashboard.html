@@ -18,7 +18,7 @@
 
         <!-- Quick Stats -->
         <div class="dashboard">
-            <div class="card">
+            <div class="card no-hover">
                 <h3>🟢 Trạng Thái Server</h3>
                 <div class="card-content">
                     <div>
@@ -32,7 +32,7 @@
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card no-hover">
                 <h3>📊 Tổng Requests</h3>
                 <div class="card-content">
                     <div>
@@ -43,7 +43,7 @@
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card no-hover">
                 <h3>⏱️ Thời Gian Phản Hồi TB</h3>
                 <div class="card-content">
                     <div>
@@ -54,7 +54,7 @@
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card no-hover">
                 <h3>👥 Kết Nối Đang Hoạt Động</h3>
                 <div class="card-content">
                     <div>
@@ -65,8 +65,8 @@
                 </div>
             </div>
 
-            <div class="card">
-                <h3>💾 Dữ Liệu Được Phục Vụ</h3>
+            <div class="card no-hover">
+                <h3>💾 Dữ Liệu Được Phục VỤ</h3>
                 <div class="card-content">
                     <div>
                         <div class="card-label">Dữ Liệu Phục Vụ</div>
@@ -76,7 +76,7 @@
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card no-hover">
                 <h3>⚙️ Threads</h3>
                 <div class="card-content">
                     <div>
@@ -90,7 +90,7 @@
 
         <!-- Server Information & Requests -->
         <div class="grid-2">
-            <div class="large-card">
+            <div class="large-card no-hover">
                 <h2>📋 Cấu Hình Server</h2>
                 <table class="info-table">
                     <tr>
@@ -128,7 +128,7 @@
                 </table>
             </div>
 
-            <div class="large-card">
+            <div class="large-card no-hover">
                 <h2>🎯 Phương Thức HTTP Được Hỗ Trợ</h2>
                 <table class="info-table">
                     <tr>
@@ -173,7 +173,7 @@
 
         <!-- Recent Requests & Server Logs -->
         <div class="grid-2">
-            <div class="large-card">
+            <div class="large-card no-hover">
                 <h2>📡 Requests Gần Đây <span class="refresh-indicator"></span></h2>
                 <div class="request-list" id="request-list">
                     <div class="request-item">
@@ -202,22 +202,22 @@
                     </div>
                 </div>
                 <div class="stats-grid">
-                    <div class="stat-box">
+                    <div class="stat-box no-hover">
                         <div class="stat-value" id="req-success">0</div>
                         <div class="stat-label">Thành Công (2xx)</div>
                     </div>
-                    <div class="stat-box">
+                    <div class="stat-box no-hover">
                         <div class="stat-value" id="req-error">0</div>
                         <div class="stat-label">Lỗi (4xx/5xx)</div>
                     </div>
-                    <div class="stat-box">
+                    <div class="stat-box no-hover">
                         <div class="stat-value" id="req-per-sec">0</div>
                         <div class="stat-label">Req/Giây</div>
                     </div>
                 </div>
             </div>
 
-            <div class="large-card">
+            <div class="large-card no-hover">
                 <h2>📝 Logs Server</h2>
                 <div class="log-container" id="log-container">
                     <div class="log-line">
@@ -245,7 +245,7 @@
         </div>
 
         <!-- Server Controls -->
-        <div class="large-card" style="margin-bottom: 30px;">
+        <div class="large-card no-hover" style="margin-bottom: 30px;">
             <h2>🎮 Điều Khiển Server</h2>
             <div class="btn-group">
                 <button class="btn-primary" onclick="alert('Server đang chạy. Sử dụng Ctrl+C trong terminal để dừng.')">
