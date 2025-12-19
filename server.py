@@ -26,7 +26,6 @@ from datetime import datetime
 # ============================================================================
 
 class ThreadSafeLogger:
-    """Logger thread-safe cho web server"""
     
     def __init__(self, log_file):
         """
@@ -84,7 +83,7 @@ class ThreadSafeLogger:
         self.log_buffer.append(msg)
     
     def tao_log_entry(self, level, msg):
-        """Tạo log entry với format đầy đủ"""
+        """Tạo log entry với format"""
         ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         return f'{ts} - [{threading.current_thread().name}] - {level} - {msg}'
     
