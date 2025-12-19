@@ -178,7 +178,6 @@ class HTTPClient:
         print(f'Tỷ lệ: {len(success) / total_requests * 100:.1f}%')
         print()
 
-        # Use all times (including failed) to match web client behavior
         times = [r['response_time'] for r in self.results if r.get('response_time') is not None]
         if times:
             print(f'Thời gian: Min={min(times):.2f}ms | Max={max(times):.2f}ms | Avg={statistics.mean(times):.2f}ms')
@@ -188,7 +187,6 @@ class HTTPClient:
         print(f'Throughput: {total_requests / total_time:.2f} req/s')
         print()
 
-        # Status code distribution (including non-success codes and 'ERROR')
         codes = {}
         for r in self.results:
             code = r.get('status_code') if r.get('status_code') is not None else (r.get('error') or 'ERROR')
@@ -251,9 +249,7 @@ class HTTPClient:
             print(f'✗ Lỗi khi ghi JSON: {e}')
 
 
-# ============================================================================
 # MAIN
-# ============================================================================
 
 def main():
     """Chạy test (CLI) - compatible với cấu hình từ web client
@@ -274,7 +270,6 @@ def main():
     parser.add_argument('--inject-failure-rate', default=0.0, type=float, help='Probability to inject simulated failure (0..1)')
     parser.add_argument('--write-json', action='store_true', help='Write results to public/last_results.json')
     parser.add_argument('--send-api', action='store_true', help='POST results to /api/test-results')
-
     args = parser.parse_args()
 
     HOST, PORT = args.host, args.port
