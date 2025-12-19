@@ -32,7 +32,6 @@ class HTTPClient:
             host: server host
             port: server port
             timeout: socket timeout (seconds)
-            inject_failure_rate: probability (0..1) to inject simulated failure per request
         """
         self.host = host
         self.port = port
@@ -123,7 +122,7 @@ class HTTPClient:
         return result
     
     def test_concurrent(self, num_requests=20, paths=None, concurrency=5, method='GET', write_json=False, send_api=False):
-        """Test gửi nhiều requests đồng thời
+        """Test gửi nhiều requests đồng thời, song song
         """
         if paths is None:
             paths = ['/', '/about.html', '/style.css']
@@ -263,15 +262,8 @@ def main():
       --host HOST
       --port PORT
       --num-requests N
-      --concurrency N
-      --timeout S
-      --paths "/,/index.html" (comma separated)
-      --method GET|HEAD
-      --inject-failure-rate 0.0 (0..1)
-      --write-json (ghi public/last_results.json)
-      --send-api (post results to /api/test-results)
     """
-    parser = argparse.ArgumentParser(description='Client test runner (compatible with web client parameters)')
+    parser = argparse.ArgumentParser(description='Client test runner')
     parser.add_argument('--host', default='localhost')
     parser.add_argument('--port', default=5000, type=int)
     parser.add_argument('--num-requests', default=20, type=int)
@@ -286,7 +278,7 @@ def main():
     args = parser.parse_args()
 
     HOST, PORT = args.host, args.port
-    NUM_REQUESTS = args.num_requests
+    NUM_REQUESTS = args.num_requests 
     concurrency = args.concurrency
     timeout = args.timeout
     paths = [p.strip() for p in args.paths.split(',') if p.strip()]
