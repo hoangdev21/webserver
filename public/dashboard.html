@@ -4,270 +4,301 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Server - Bảng Điều Khiển Web Server</title>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>🚀 Bảng Điều Khiển Server</h1>
-            <p>Giao Diện Quản Lý Web Server - Theo Dõi và Quản Lý Server Tĩnh Đa Luồng</p>
+        <header class="premium-header">
+            <div class="header-content">
+                <div class="header-title">
+                    <h1>🚀 Server Dashboard</h1>
+                    <p class="header-subtitle">Bảng Điều Khiển Web Server Chuyên Nghiệp</p>
+                </div>
+                <div class="header-badge">
+                    <span class="status-live"></span>
+                    <span>Trực Tuyến</span>
+                </div>
+            </div>
         </header>
 
         <!-- Quick Stats -->
-        <div class="dashboard">
-            <div class="card no-hover">
-                <h3>🟢 Trạng Thái Server</h3>
+        <div class="stats-section">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-icon">⚡</span>
+                    <h3>Trạng Thái Server</h3>
+                </div>
+                <div class="stat-body">
+                    <div class="status-badge online">
+                        <span class="pulse"></span>
+                        Trực Tuyến
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-icon">📊</span>
+                    <h3>Tổng Requests</h3>
+                </div>
+                <div class="stat-body">
+                    <div class="big-number" id="total-requests">0</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-icon">⚙️</span>
+                    <h3>Thời Gian Phản Hồi</h3>
+                </div>
+                <div class="stat-body">
+                    <div class="big-number" id="avg-response">2.5<span class="unit">ms</span></div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-icon">🔗</span>
+                    <h3>Kết Nối Hoạt Động</h3>
+                </div>
+                <div class="stat-body">
+                    <div class="big-number" id="active-connections">0</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-icon">💾</span>
+                    <h3>Dữ Liệu Phục Vụ</h3>
+                </div>
+                <div class="stat-body">
+                    <div class="big-number" id="data-served">0<span class="unit">MB</span></div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-icon">🔄</span>
+                    <h3>Thread Pool</h3>
+                </div>
+                <div class="stat-body">
+                    <div class="progress-circle">
+                        <div class="progress-pie" style="--value: 100;"></div>
+                        <div class="progress-text">10</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Server Configuration -->
+        <div class="content-grid">
+            <div class="section-card premium">
+                <div class="card-header">
+                    <h2>📋 Cấu Hình Server</h2>
+                </div>
                 <div class="card-content">
-                    <div>
-                        <div class="card-label">Tình Trạng</div>
-                        <div class="card-value">
-                            <span class="status-indicator status-online"></span>
-                            Trực Tuyến
+                    <table class="config-table">
+                        <tr>
+                            <td class="label">Địa Chỉ</td>
+                            <td class="value">0.0.0.0:5000</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Thư Mục</td>
+                            <td class="value">./public</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Logs</td>
+                            <td class="value">./logs/server.log</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Max Threads</td>
+                            <td class="value">10</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Socket Timeout</td>
+                            <td class="value">30s</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Chunk Size</td>
+                            <td class="value">8192 bytes</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Uptime</td>
+                            <td class="value" id="uptime">00:00:00</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Khởi Động</td>
+                            <td class="value" id="last-started">N/A</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section-card premium">
+                <div class="card-header">
+                    <h2>🎯 Phương Thức HTTP & MIME</h2>
+                </div>
+                <div class="card-content">
+                    <div class="method-grid">
+                        <div class="method-item success">
+                            <span class="badge">GET</span>
+                            <span class="desc">Lấy nội dung</span>
+                        </div>
+                        <div class="method-item success">
+                            <span class="badge">HEAD</span>
+                            <span class="desc">Lấy headers</span>
+                        </div>
+                        <div class="method-item disabled">
+                            <span class="badge">POST</span>
+                            <span class="desc">Không hỗ trợ</span>
+                        </div>
+                        <div class="method-item disabled">
+                            <span class="badge">PUT</span>
+                            <span class="desc">Không hỗ trợ</span>
                         </div>
                     </div>
-                    <div class="card-icon">⚡</div>
-                </div>
-            </div>
-
-            <div class="card no-hover">
-                <h3>📊 Tổng Requests</h3>
-                <div class="card-content">
-                    <div>
-                        <div class="card-label">Tổng Requests</div>
-                        <div class="card-value" id="total-requests">0</div>
+                    <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--card-border);">
+                        <h3 style="font-size: 1rem; margin-bottom: 16px; color: var(--text-primary);">Loại MIME Hỗ Trợ</h3>
+                        <div class="mime-grid">
+                            <div class="mime-item">
+                                <span class="mime-icon">🌐</span>
+                                <span>Web: .html, .css, .js</span>
+                            </div>
+                            <div class="mime-item">
+                                <span class="mime-icon">🖼️</span>
+                                <span>Hình: .png, .jpg, .gif</span>
+                            </div>
+                            <div class="mime-item">
+                                <span class="mime-icon">📄</span>
+                                <span>Tài liệu: .pdf, .json</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-icon">📈</div>
-                </div>
-            </div>
-
-            <div class="card no-hover">
-                <h3>⏱️ Thời Gian Phản Hồi TB</h3>
-                <div class="card-content">
-                    <div>
-                        <div class="card-label">Thời Gian Trung Bình</div>
-                        <div class="card-value" id="avg-response">2.5ms</div>
-                    </div>
-                    <div class="card-icon">⚙️</div>
-                </div>
-            </div>
-
-            <div class="card no-hover">
-                <h3>👥 Kết Nối Đang Hoạt Động</h3>
-                <div class="card-content">
-                    <div>
-                        <div class="card-label">Kết Nối Hiện Tại</div>
-                        <div class="card-value" id="active-connections">0</div>
-                    </div>
-                    <div class="card-icon">🔗</div>
-                </div>
-            </div>
-
-            <div class="card no-hover">
-                <h3>💾 Dữ Liệu Được Phục VỤ</h3>
-                <div class="card-content">
-                    <div>
-                        <div class="card-label">Dữ Liệu Phục Vụ</div>
-                        <div class="card-value" id="data-served">0 MB</div>
-                    </div>
-                    <div class="card-icon">💿</div>
-                </div>
-            </div>
-
-            <div class="card no-hover">
-                <h3>⚙️ Threads</h3>
-                <div class="card-content">
-                    <div>
-                        <div class="card-label">Trạng Thái Thread Pool</div>
-                        <div class="card-value">10</div>
-                    </div>
-                    <div class="card-icon">🔄</div>
                 </div>
             </div>
         </div>
 
-        <!-- Server Information & Requests -->
-        <div class="grid-2">
-            <div class="large-card no-hover">
-                <h2>📋 Cấu Hình Server</h2>
-                <table class="info-table">
-                    <tr>
-                        <td>Địa Chỉ Server</td>
-                        <td>0.0.0.0:5000</td>
-                    </tr>
-                    <tr>
-                        <td>Thư Mục Public</td>
-                        <td>./public</td>
-                    </tr>
-                    <tr>
-                        <td>File Log</td>
-                        <td>./logs/server.log</td>
-                    </tr>
-                    <tr>
-                        <td>Threads Tối Đa</td>
-                        <td>10</td>
-                    </tr>
-                    <tr>
-                        <td>Socket Timeout</td>
-                        <td>30 giây</td>
-                    </tr>
-                    <tr>
-                        <td>Kích Thước Chunk</td>
-                        <td>8192 bytes</td>
-                    </tr>
-                    <tr>
-                        <td>Thời Gian Chạy</td>
-                        <td id="uptime">00:00:00</td>
-                    </tr>
-                    <tr>
-                        <td>Lần Khởi Động Cuối</td>
-                        <td id="last-started">N/A</td>
-                    </tr>
-                </table>
-            </div>
-
-            <div class="large-card no-hover">
-                <h2>🎯 Phương Thức HTTP Được Hỗ Trợ</h2>
-                <table class="info-table">
-                    <tr>
-                        <td><span class="badge badge-success">GET</span></td>
-                        <td>Lấy nội dung tài nguyên</td>
-                    </tr>
-                    <tr>
-                        <td><span class="badge badge-success">HEAD</span></td>
-                        <td>Lấy headers chỉ</td>
-                    </tr>
-                    <tr>
-                        <td><span class="badge badge-danger">POST</span></td>
-                        <td>Không được hỗ trợ</td>
-                    </tr>
-                    <tr>
-                        <td><span class="badge badge-danger">PUT</span></td>
-                        <td>Không được hỗ trợ</td>
-                    </tr>
-                    <tr>
-                        <td><span class="badge badge-danger">DELETE</span></td>
-                        <td>Không được hỗ trợ</td>
-                    </tr>
-                </table>
-
-                <h2 style="margin-top: 30px;">📁 Các Loại MIME Được Hỗ Trợ</h2>
-                <table class="info-table">
-                    <tr>
-                        <td>.html, .css, .js</td>
-                        <td>Tài Nguyên Web</td>
-                    </tr>
-                    <tr>
-                        <td>.png, .jpg, .gif, .svg</td>
-                        <td>Hình Ảnh</td>
-                    </tr>
-                    <tr>
-                        <td>.pdf, .json, .txt</td>
-                        <td>Tài Liệu</td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-
-        <!-- Recent Requests & Server Logs -->
-        <div class="grid-2">
-            <div class="large-card no-hover">
-                <h2>📡 Requests Gần Đây <span class="refresh-indicator"></span></h2>
-                <div class="request-list" id="request-list">
-                    <div class="request-item">
-                        <span class="request-method get">GET</span>
-                        <span>/</span>
-                        <span class="request-status success">200</span>
-                        <span style="float: right; color: #999;">2.3ms</span>
-                    </div>
-                    <div class="request-item">
-                        <span class="request-method get">GET</span>
-                        <span>/style.css</span>
-                        <span class="request-status success">200</span>
-                        <span style="float: right; color: #999;">1.8ms</span>
-                    </div>
-                    <div class="request-item">
-                        <span class="request-method get">GET</span>
-                        <span>/about.html</span>
-                        <span class="request-status success">200</span>
-                        <span style="float: right; color: #999;">2.1ms</span>
-                    </div>
-                    <div class="request-item">
-                        <span class="request-method get">GET</span>
-                        <span>/nonexistent.html</span>
-                        <span class="request-status error">404</span>
-                        <span style="float: right; color: #999;">1.5ms</span>
-                    </div>
+        <!-- Recent Requests & Logs -->
+        <div class="content-grid">
+            <div class="section-card premium">
+                <div class="card-header">
+                    <h2>📡 Requests Gần Đây</h2>
                 </div>
-                <div class="stats-grid">
-                    <div class="stat-box no-hover">
-                        <div class="stat-value" id="req-success">0</div>
-                        <div class="stat-label">Thành Công (2xx)</div>
+                <div class="card-content">
+                    <div class="requests-panel" id="request-list">
+                        <div class="request-row">
+                            <span class="method-badge get">GET</span>
+                            <span class="path">/</span>
+                            <span class="status-code success">200</span>
+                            <span class="time">2.3ms</span>
+                        </div>
+                        <div class="request-row">
+                            <span class="method-badge get">GET</span>
+                            <span class="path">/style.css</span>
+                            <span class="status-code success">200</span>
+                            <span class="time">1.8ms</span>
+                        </div>
+                        <div class="request-row">
+                            <span class="method-badge get">GET</span>
+                            <span class="path">/about.html</span>
+                            <span class="status-code success">200</span>
+                            <span class="time">2.1ms</span>
+                        </div>
+                        <div class="request-row">
+                            <span class="method-badge get">GET</span>
+                            <span class="path">/nonexistent.html</span>
+                            <span class="status-code error">404</span>
+                            <span class="time">1.5ms</span>
+                        </div>
                     </div>
-                    <div class="stat-box no-hover">
-                        <div class="stat-value" id="req-error">0</div>
-                        <div class="stat-label">Lỗi (4xx/5xx)</div>
-                    </div>
-                    <div class="stat-box no-hover">
-                        <div class="stat-value" id="req-per-sec">0</div>
-                        <div class="stat-label">Req/Giây</div>
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <div class="metric-value success" id="req-success">0</div>
+                            <div class="metric-label">Thành Công</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value error" id="req-error">0</div>
+                            <div class="metric-label">Lỗi</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value" id="req-per-sec">0</div>
+                            <div class="metric-label">Req/Giây</div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="large-card no-hover">
-                <h2>📝 Logs Server</h2>
-                <div class="log-container" id="log-container">
-                    <div class="log-line">
-                        <span class="log-time">[2025-12-11 14:30:00]</span>
-                        <span class="log-level-info">[INFO]</span>
-                        <span class="log-message">Web Server khởi tạo - 0.0.0.0:5000</span>
-                    </div>
-                    <div class="log-line">
-                        <span class="log-time">[2025-12-11 14:30:01]</span>
-                        <span class="log-level-info">[INFO]</span>
-                        <span class="log-message">Server bắt đầu lắng nghe tại http://0.0.0.0:5000</span>
-                    </div>
-                    <div class="log-line">
-                        <span class="log-time">[2025-12-11 14:30:05]</span>
-                        <span class="log-level-info">[INFO]</span>
-                        <span class="log-message">127.0.0.1:12345 - GET / HTTP/1.1</span>
-                    </div>
-                    <div class="log-line">
-                        <span class="log-time">[2025-12-11 14:30:05]</span>
-                        <span class="log-level-info">[INFO]</span>
-                        <span class="log-message">127.0.0.1:12345 - 200: / (1245 bytes)</span>
+            <div class="section-card premium">
+                <div class="card-header">
+                    <h2>📝 Server Logs</h2>
+                </div>
+                <div class="card-content">
+                    <div class="logs-panel" id="log-container">
+                        <div class="log-entry info">
+                            <span class="log-time">[2025-12-19 14:30:00]</span>
+                            <span class="log-tag">INFO</span>
+                            <span class="log-msg">Web Server khởi tạo - 0.0.0.0:5000</span>
+                        </div>
+                        <div class="log-entry info">
+                            <span class="log-time">[2025-12-19 14:30:01]</span>
+                            <span class="log-tag">INFO</span>
+                            <span class="log-msg">Server bắt đầu lắng nghe tại http://0.0.0.0:5000</span>
+                        </div>
+                        <div class="log-entry info">
+                            <span class="log-time">[2025-12-19 14:30:05]</span>
+                            <span class="log-tag">INFO</span>
+                            <span class="log-msg">127.0.0.1:12345 - GET / HTTP/1.1</span>
+                        </div>
+                        <div class="log-entry success">
+                            <span class="log-time">[2025-12-19 14:30:05]</span>
+                            <span class="log-tag">SUCCESS</span>
+                            <span class="log-msg">127.0.0.1:12345 - 200: / (1245 bytes)</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Server Controls -->
-        <div class="large-card no-hover" style="margin-bottom: 30px;">
-            <h2>🎮 Điều Khiển Server</h2>
-            <div class="btn-group">
-                <button class="btn-primary" onclick="alert('Server đang chạy. Sử dụng Ctrl+C trong terminal để dừng.')">
-                    🔄 Khởi Động Lại Server
-                </button>
-                <button class="btn-secondary" onclick="downloadLogs()">
-                    📥 Tải Logs
-                </button>
-                <button class="btn-secondary" onclick="viewStatistics()">
-                    📊 Xem Thống Kê
-                </button>
-                <button class="btn-secondary" onclick="testServer()">
-                    🧪 Kiểm Tra Server
-                </button>
-                <button class="btn-danger" onclick="alert('Để dừng server, nhấn Ctrl+C trong terminal.')">
-                    🛑 Dừng Server
-                </button>
+        <div class="section-card premium full-width" style="margin-bottom: 30px;">
+            <div class="card-header">
+                <h2>🎮 Điều Khiển Server</h2>
+            </div>
+            <div class="card-content">
+                <div class="controls-grid">
+                    <button class="btn-control primary" onclick="alert('Server đang chạy. Sử dụng Ctrl+C để dừng.')">
+                        <span class="btn-icon">🔄</span>
+                        <span>Khởi Động Lại</span>
+                    </button>
+                    <button class="btn-control secondary" onclick="downloadLogs()">
+                        <span class="btn-icon">📥</span>
+                        <span>Tải Logs</span>
+                    </button>
+                    <button class="btn-control secondary" onclick="viewStatistics()">
+                        <span class="btn-icon">📊</span>
+                        <span>Thống Kê</span>
+                    </button>
+                    <button class="btn-control secondary" onclick="testServer()">
+                        <span class="btn-icon">🧪</span>
+                        <span>Kiểm Tra</span>
+                    </button>
+                    <button class="btn-control danger" onclick="alert('Để dừng server, nhấn Ctrl+C trong terminal.')">
+                        <span class="btn-icon">🛑</span>
+                        <span>Dừng Server</span>
+                    </button>
+                </div>
             </div>
         </div>
 
-        <footer>
-            <p>&copy; 2025 Dashboard Server Web | Xây Dựng Bằng Python & HTML5 | Lần Cập Nhật Cuối: <span id="last-update">Vừa Rồi</span></p>
+        <footer class="premium-footer">
+            <div class="footer-content">
+                <p>© 2025 Server Dashboard | Python + HTML5/CSS3 | v1.0</p>
+                <span class="divider">•</span>
+                <p class="last-update">Cập nhật: <span id="last-update">Vừa rồi</span></p>
+            </div>
         </footer>
     </div>
 
