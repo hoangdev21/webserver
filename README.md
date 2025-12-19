@@ -59,7 +59,7 @@ python server.py
 python client_test.py
 
 # Output:
-# Kiểm tra kết nối server...
+# Kiểm tra kết nối server...P
 # ✓ Server online tại http://127.0.0.1:8000
 #
 # ======================================================================
