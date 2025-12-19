@@ -282,6 +282,9 @@ def main():
     write_json = args.write_json
     send_api = args.send_api
 
+
+    
+
     client = HTTPClient(HOST, PORT, timeout=timeout, inject_failure_rate=inject_rate)
 
     print('Kiểm tra kết nối server...')
