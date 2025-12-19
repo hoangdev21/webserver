@@ -261,7 +261,7 @@ class HTTPServer:
                     req += data
                     if b'\r\n\r\n' in req: break
                 except socket.timeout:
-                    break
+                    break 
             
             if not req:
                 self.logger.warning(f'{ip}:{port} - Không nhận được request')

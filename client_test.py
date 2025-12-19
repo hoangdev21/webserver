@@ -43,11 +43,7 @@ class HTTPClient:
     
     def gui_request(self, path='/', method='GET', request_id=0):
         """Gửi HTTP request và nhận response
-
-        Simulated failures may be injected according to self.inject_failure_rate. When a simulated
-        failure occurs, either a server error code (500/503/504) will be returned or an exception
-        will be raised to simulate a network failure; this mirrors behavior you might see from a
-        real environment and helps the web client and python client produce similar distributions.
+        Error code (500/503/504)
         """
         start_time = time.time()
         result = {'request_id': request_id, 'path': path, 'method': method,
@@ -128,14 +124,6 @@ class HTTPClient:
     
     def test_concurrent(self, num_requests=20, paths=None, concurrency=5, method='GET', write_json=False, send_api=False):
         """Test gửi nhiều requests đồng thời
-
-        Args:
-            num_requests: total requests to send
-            paths: list of paths to rotate through
-            concurrency: number of worker threads
-            method: HTTP method to use
-            write_json: whether to write results to public/last_results.json
-            send_api: whether to post results to the server API
         """
         if paths is None:
             paths = ['/', '/about.html', '/style.css']
